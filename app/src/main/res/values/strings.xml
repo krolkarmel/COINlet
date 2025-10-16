@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">C0inlet</string>
+    <string name="back_id" />
+    <string name="logo_coinllet" />
+    <string name="email" />
+    <string name="podaj_imie" />
+    <string name="password" />
+    <string name="zaloguj_sie" />
+    <string name="finger_id" />
+    <string name="face_id" />
+    <string name="obywatelstwo">Obywatelstwo:</string>
+    <string name="potwierdzam_ze_mam_ukonczone_18_lat">Potwierdzam, że mam ukończone 18 lat.</string>
+    <string name="rozpocznij">Rozpocznij</string>
+    <string name="krok_1_z_6">Krok 1 z 6</string>
+    <string name="jezyk_aplikacji">Język aplikacji:</string>
+    <string name="podaj_dane_kontaktowe">Podaj dane kontaktowe</string>
+    <string name="wyslij_kod">Wyślij kod</string>
+    <string name="na_ten_numer_wyslny_zostanie_kod_potwierdzajacy">Na ten numer wysłany zostanie kod potwierdzający.</string>
+    <string name="krok_2_z_6">Krok 2 z 6</string>
+
+    <string-array name="languages">
+        <item>-PL- Polski</item>
+        <item>-ENG- Angielski</item>
+    </string-array>
+
+    <string-array name="nationality">
+        <item>-PL- Polskie</item>
+        <item>-ENG- Angielskie</item>
+        <item>-FRA- Francuskie</item>
+        <item>-DEN- Duńskie</item>
+    </string-array>
+
+    <string-array name="numberPrefix">
+        <item>+48</item>
+        <item>+49</item>
+        <item>+50</item>
+        <item>+22</item>
+    </string-array>
+
+</resources>
