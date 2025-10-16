@@ -2,6 +2,10 @@ package com.coinlet.register
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -24,6 +28,28 @@ class SecondStepRegister : AppCompatActivity() {
             insets
         }
 
+        val spinner = findViewById<Spinner>(R.id.numberSpinner)
+
+        val arrayAdapter = ArrayAdapter.createFromResource(
+            this@SecondStepRegister,
+            R.array.numberPrefix,
+            android.R.layout.simple_spinner_dropdown_item
+        )
+        spinner.adapter = arrayAdapter
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                p0: AdapterView<*>?,
+                p1: View?,
+                p2: Int,
+                p3: Long
+            ) {
+                //
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                //
+            }
+        }
 
 
         binding.btnSendCode.setOnClickListener {

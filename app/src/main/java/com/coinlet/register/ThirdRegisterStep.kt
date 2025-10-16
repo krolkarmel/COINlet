@@ -33,7 +33,8 @@ class ThirdRegisterStep : AppCompatActivity() {
             val secondName = binding.secondNameInput.text.toString()
             val lastName = binding.lastNameInput.text.toString()
             val birthDate = binding.birthDateInput.text.toString()
-            val pesel = binding.peselInput.text.toString().toInt()
+            val pesel = binding.peselInput.text.toString()
+            val email = binding.emailInput.text.toString()
             val intent = Intent(this, IdRegisterStep::class.java)
             intent.putExtra("nationality", nationality)
             intent.putExtra("phoneNumber", phoneNumber)
@@ -42,6 +43,7 @@ class ThirdRegisterStep : AppCompatActivity() {
             intent.putExtra("lastName", lastName)
             intent.putExtra("birthDate", birthDate)
             intent.putExtra("pesel", pesel)
+            intent.putExtra("email", email)
             startActivity(intent)
         }
 

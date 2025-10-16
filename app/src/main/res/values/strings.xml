@@ -31,10 +31,216 @@
     </string-array>
 
     <string-array name="numberPrefix">
-        <item>+48</item>
-        <item>+49</item>
-        <item>+50</item>
-        <item>+22</item>
+        <item>Afganistan +93</item>
+        <item>Alaska +1907</item>
+        <item>Albania +355</item>
+        <item>Algieria +213</item>
+        <item>Andora +376</item>
+        <item>Angola +244</item>
+        <item>Antyle Holenderskie +599</item>
+        <item>Arabia Saudyjska +966</item>
+        <item>Argentyna +54</item>
+        <item>Armenia +374</item>
+        <item>Australia +61</item>
+        <item>Austria +43</item>
+        <item>Azerbejdżan +994</item>
+        <item>Bahrajn +973</item>
+        <item>Bangladesz +880</item>
+        <item>Belgia +32</item>
+        <item>Benin +229</item>
+        <item>Białoruś +375</item>
+        <item>Boliwia +591</item>
+        <item>Bośnia i Hercegowina +387</item>
+        <item>Botswana +267</item>
+        <item>Brazylia +55</item>
+        <item>Brunei +673</item>
+        <item>Bułgaria +359</item>
+        <item>Burkina Faso +226</item>
+        <item>Burundi +257</item>
+        <item>Chile +56</item>
+        <item>Chiny +86</item>
+        <item>Chorwacja +385</item>
+        <item>Cook’a Wyspy +682</item>
+        <item>Cypr +357</item>
+        <item>Czad +235</item>
+        <item>Bahamy +1242</item>
+        <item>Dominikana +1809</item>
+        <item>Czechy +420</item>
+        <item>Dania +45</item>
+        <item>Diego Garcia +246</item>
+        <item>Dżibuti +253</item>
+        <item>Egipt +20</item>
+        <item>Ekwador +593</item>
+        <item>Erytrea +291</item>
+        <item>Estonia +372</item>
+        <item>Etiopia +251</item>
+        <item>Falklandy +500</item>
+        <item>Fidżi +679</item>
+        <item>Filipiny +63</item>
+        <item>Finlandia +358</item>
+        <item>Francja +33</item>
+        <item>Gabon +241</item>
+        <item>Gambia +220</item>
+        <item>Ghana +233</item>
+        <item>Gibraltar +350</item>
+        <item>Grecja +30</item>
+        <item>Grenlandia +299</item>
+        <item>Gruzja +995</item>
+        <item>Gwadelupa +590</item>
+        <item>Gujana +592</item>
+        <item>Gujana Francuska +594</item>
+        <item>Gwinea +224</item>
+        <item>Gwinea Równikowa +240</item>
+        <item>Gwinea – Bissau +245</item>
+        <item>Hawaje +1808</item>
+        <item>Hiszpania +34</item>
+        <item>Holandia +31</item>
+        <item>Hong Kong +852</item>
+        <item>Indie +91</item>
+        <item>Indonezja +62</item>
+        <item>Irak +964</item>
+        <item>Iran +98</item>
+        <item>Irlandia +353</item>
+        <item>Islandia +354</item>
+        <item>Izrael +972</item>
+        <item>Japonia +81</item>
+        <item>Jemen +967</item>
+        <item>Jordania +962</item>
+        <item>Jugosławia +381</item>
+        <item>Kambodża +588</item>
+        <item>Kamerun +237</item>
+        <item>Kanada +1</item>
+        <item>Kanaryjskie Wyspy +34</item>
+        <item>Katar +974</item>
+        <item>Kazachstan +7</item>
+        <item>Kenia +254</item>
+        <item>Kirgistan +996</item>
+        <item>Kiribati +686</item>
+        <item>Kolumbia +57</item>
+        <item>Komory +269</item>
+        <item>Kongo +242</item>
+        <item>Kongo Republika Demokrat. +234</item>
+        <item>Korea Południowa +82</item>
+        <item>Koreańska RL-D +850</item>
+        <item>Kostaryka +506</item>
+        <item>Kuba +53</item>
+        <item>Kuwejt +965</item>
+        <item>Laos +856</item>
+        <item>Lesotho +266</item>
+        <item>Liban +961</item>
+        <item>Liberia +231</item>
+        <item>Libia +218</item>
+        <item>Liechtenstein +423</item>
+        <item>Litwa +370</item>
+        <item>Luksemburg +352</item>
+        <item>Łotwa +371</item>
+        <item>Macedonia +389</item>
+        <item>Madagaskar +261</item>
+        <item>Makau +853</item>
+        <item>Malawi +265</item>
+        <item>Malediwy +960</item>
+        <item>Malezja +60</item>
+        <item>Mali +223</item>
+        <item>Malta +356</item>
+        <item>Martynika +596</item>
+        <item>Maroko +212</item>
+        <item>Marshalla Wyspy +692</item>
+        <item>Mauretania +222</item>
+        <item>Mauritius +230</item>
+        <item>Meksyk +52</item>
+        <item>Mołdawia +373</item>
+        <item>Monako +377</item>
+        <item>Mongolia +976</item>
+        <item>Mozambik +258</item>
+        <item>Myanmar (Birma) +95</item>
+        <item>Namibia +264</item>
+        <item>Nauru +674</item>
+        <item>Nepal +977</item>
+        <item>Niemcy +49</item>
+        <item>Niger +227</item>
+        <item>Nigeria +234</item>
+        <item>Nikaragua +505</item>
+        <item>Niue +683</item>
+        <item>Norfolk Wyspa +672</item>
+        <item>Norwegia +47</item>
+        <item>Nowa Kaledonia +687</item>
+        <item>Nowa Zelandia +64</item>
+        <item>Oman +968</item>
+        <item>Owcze Wyspy +298</item>
+        <item>Pakistan +92</item>
+        <item>Palau +680</item>
+        <item>Palestyna +970</item>
+        <item>Panama +507</item>
+        <item>Papua Nowa Gwinea +675</item>
+        <item>Paragwaj +595</item>
+        <item>Peru +51</item>
+        <item>Polinezja Francuska +689</item>
+        <item>Polska +48</item>
+        <item>Portugalia +351</item>
+        <item>Portoryko +1787</item>
+        <item>Republika Południowej Afryki +27</item>
+        <item>Republika Środkowoafrykańska +236</item>
+        <item>Reunion +262</item>
+        <item>Rosja +7</item>
+        <item>Rumunia +40</item>
+        <item>Rwanda +250</item>
+        <item>Sain Christopher i Nevis +1869</item>
+        <item>Saint Lucia +1758</item>
+        <item>Saint Vincent +1809</item>
+        <item>Salomona Wyspy +677</item>
+        <item>Salwador +503</item>
+        <item>Samoa +684</item>
+        <item>Samoa Zachodnie +685</item>
+        <item>San Marino +378</item>
+        <item>Senegal +221</item>
+        <item>Seszele +248</item>
+        <item>Sierra Leone +232</item>
+        <item>Singapur +65</item>
+        <item>Słowacja +421</item>
+        <item>Słowenia +386</item>
+        <item>Somalia +252</item>
+        <item>Sri Lanka +94</item>
+        <item>Stany Zjednoczone Ameryki +1</item>
+        <item>Suazi +268</item>
+        <item>Sudan +249</item>
+        <item>Surinam +597</item>
+        <item>Syria +963</item>
+        <item>Szwajcaria +41</item>
+        <item>Szwecja +46</item>
+        <item>Św. Heleny Wyspa +290</item>
+        <item>Św. Piotra i Mikeleona Wyspy +508</item>
+        <item>Św. Tomasza Wyspy +239</item>
+        <item>Tadżykistan +992</item>
+        <item>Tajlandia +66</item>
+        <item>Tajwan +886</item>
+        <item>Tanzania +255</item>
+        <item>Togo +228</item>
+        <item>Tokelau +690</item>
+        <item>Tonga +676</item>
+        <item>Tunezja +216</item>
+        <item>Turcja +90</item>
+        <item>Turkmenistan +993</item>
+        <item>Turks i Caicos +1649</item>
+        <item>Tuvalu +688</item>
+        <item>Uganda +256</item>
+        <item>Ukraina +380</item>
+        <item>Urugwaj +598</item>
+        <item>Uzbekistan +998</item>
+        <item>Vanuatu +678</item>
+        <item>Wallis i Futuna +681</item>
+        <item>Watykan +39</item>
+        <item>Wenezuela +58</item>
+        <item>Węgry +36</item>
+        <item>Wielka Brytania +44</item>
+        <item>Wietnam +84</item>
+        <item>Włochy +39</item>
+        <item>Wniebowstąpienia Wyspa +247</item>
+        <item>Wybrzeże Kości Słoniowej +225</item>
+        <item>Zambia +260</item>
+        <item>Zanzibar +259</item>
+        <item>Zielonego Przylądka Wyspy +238</item>
+        <item>Zimbabwe +263</item>
     </string-array>
+
 
 </resources>

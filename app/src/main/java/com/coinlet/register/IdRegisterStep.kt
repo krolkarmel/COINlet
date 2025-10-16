@@ -31,7 +31,8 @@ class IdRegisterStep : AppCompatActivity() {
             val lastName = intent.getStringExtra("lastName") ?: ""
             val birthDate = intent.getStringExtra("birthDate") ?: ""
             val pesel = intent.getStringExtra("pesel") ?: ""
-            val intent = Intent(this, IdRegisterStep::class.java)
+            val email = intent.getStringExtra("email") ?: ""
+            val intent = Intent(this, FourthRegisterStep::class.java)
             intent.putExtra("nationality", nationality)
             intent.putExtra("phoneNumber", phoneNumber)
             intent.putExtra("firstName", firstName)
@@ -39,6 +40,7 @@ class IdRegisterStep : AppCompatActivity() {
             intent.putExtra("lastName", lastName)
             intent.putExtra("birthDate", birthDate)
             intent.putExtra("pesel", pesel)
+            intent.putExtra("email", email)
             startActivity(intent)
         }
     }
