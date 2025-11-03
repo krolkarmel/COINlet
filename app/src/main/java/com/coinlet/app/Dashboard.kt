@@ -12,6 +12,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
 import com.coinlet.databinding.ActivityDashboardBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class Dashboard : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
@@ -40,6 +42,26 @@ class Dashboard : AppCompatActivity() {
         binding.btnUserProfile.setOnClickListener {view ->
             showPopup(view)
         }
+
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
+
+        val db = FirebaseFirestore.getInstance()
+        db.collection("users")
+            .document(userId)
+            .collection("accounts")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if(!snapshot.isEmpty()){
+                    val account = snapshot.documents[0]
+                    val balance = account.getDouble("balance") ?: 0.0
+                    val currency = account.getString("currency") ?: "PLN"
+
+                    binding.balanceTextView.text = "$balance $currency"
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Błąd odczytu", Toast.LENGTH_SHORT).show()
+            }
 
 
     }

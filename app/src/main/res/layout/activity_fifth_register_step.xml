@@ -75,7 +75,7 @@
         android:layout_marginHorizontal="28dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editTextTextPassword2"
+            android:id="@+id/passwordConfirmInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword" />

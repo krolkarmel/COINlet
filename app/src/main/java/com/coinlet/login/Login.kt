@@ -36,6 +36,7 @@ class Login : AppCompatActivity() {
                 SplashScreen.auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener {
                         if (it.isSuccessful) {
+//                            startActivity(Intent(this, ConfirmCodeRegisterStep::class.java))
                             startActivity(Intent(this, Dashboard::class.java))
                             finish()
                         }

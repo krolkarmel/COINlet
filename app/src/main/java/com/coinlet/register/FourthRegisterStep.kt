@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
+import com.coinlet.Validator
 import com.coinlet.databinding.ActivityFourthRegisterStepBinding
 
 class FourthRegisterStep : AppCompatActivity() {
@@ -24,36 +25,62 @@ class FourthRegisterStep : AppCompatActivity() {
 
 
         binding.btnNext.setOnClickListener {
-            val city = binding.cityInput.text.toString()
-            val street = binding.streetInput.text.toString()
-            val postalCode = binding.postalCodeInput.text.toString()
-            val houseNumber = binding.houseNumberInput.text.toString()
-            val country = binding.countryInput.text.toString()
-            val nationality = intent.getStringExtra("nationality") ?: ""
-            val phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
-            val firstName = intent.getStringExtra("firstName") ?: ""
-            val secondName = intent.getStringExtra("secondName") ?: ""
-            val lastName = intent.getStringExtra("lastName") ?: ""
-            val birthDate = intent.getStringExtra("birthDate") ?: ""
-            val pesel = intent.getStringExtra("pesel") ?: ""
-            val email = intent.getStringExtra("email") ?: ""
-            val intent = Intent(this, FifthRegisterStep::class.java)
-            intent.putExtra("nationality", nationality)
-            intent.putExtra("phoneNumber", phoneNumber)
-            intent.putExtra("firstName", firstName)
-            intent.putExtra("secondName", secondName)
-            intent.putExtra("lastName", lastName)
-            intent.putExtra("birthDate", birthDate)
-            intent.putExtra("pesel", pesel)
-            intent.putExtra("email", email)
-            intent.putExtra("city", city)
-            intent.putExtra("street", street)
-            intent.putExtra("postalCode", postalCode)
-            intent.putExtra("houseNumber", houseNumber)
-            intent.putExtra("country", country)
-            startActivity(intent)
+            if (validateForm()) {
+                val city = binding.cityInput.text.toString()
+                val street = binding.streetInput.text.toString()
+                val postalCode = binding.postalCodeInput.text.toString()
+                val houseNumber = binding.houseNumberInput.text.toString()
+                val country = binding.countryInput.text.toString()
+                val nationality = intent.getStringExtra("nationality") ?: ""
+                val phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
+                val firstName = intent.getStringExtra("firstName") ?: ""
+                val secondName = intent.getStringExtra("secondName") ?: ""
+                val lastName = intent.getStringExtra("lastName") ?: ""
+                val birthDate = intent.getStringExtra("birthDate") ?: ""
+                val pesel = intent.getStringExtra("pesel") ?: ""
+                val email = intent.getStringExtra("email") ?: ""
+                val intent = Intent(this, FifthRegisterStep::class.java)
+                intent.putExtra("nationality", nationality)
+                intent.putExtra("phoneNumber", phoneNumber)
+                intent.putExtra("firstName", firstName)
+                intent.putExtra("secondName", secondName)
+                intent.putExtra("lastName", lastName)
+                intent.putExtra("birthDate", birthDate)
+                intent.putExtra("pesel", pesel)
+                intent.putExtra("email", email)
+                intent.putExtra("city", city)
+                intent.putExtra("street", street)
+                intent.putExtra("postalCode", postalCode)
+                intent.putExtra("houseNumber", houseNumber)
+                intent.putExtra("country", country)
+                startActivity(intent)
+            }
         }
 
-
+    }
+    private fun validateForm(): Boolean{
+        var isValid = true;
+        if(!Validator.isCountryValid(binding.countryInput.text.toString())){
+            binding.countryInput.error = "Niepoprawnie wprowadzony kraj zamieszkania!"
+            isValid = false
+        }
+        else{
+            binding.countryInput.error = null
+        }
+        if(!Validator.isNumberHouseValid(binding.houseNumberInput.text.toString())){
+            binding.houseNumberInput.error = "Niepoprawnie wprowadzony numer domu!"
+            isValid = false
+        }
+        else{
+            binding.houseNumberInput.error = null
+        }
+        if(!Validator.isStreetValid(binding.streetInput.text.toString())){
+            binding.streetInput.error = "Niepoprawnie wprowadzona ulica!"
+            isValid = false
+        }
+        else{
+            binding.streetInput.error = null
+        }
+        return isValid
     }
 }

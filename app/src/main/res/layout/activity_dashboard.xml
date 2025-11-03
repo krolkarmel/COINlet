@@ -72,11 +72,11 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView14"
+                android:id="@+id/balanceTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="2,500,23 PLN"
+                android:text=""
                 android:textAlignment="center"
                 android:textSize="36sp"
                 app:layout_constraintEnd_toEndOf="parent"

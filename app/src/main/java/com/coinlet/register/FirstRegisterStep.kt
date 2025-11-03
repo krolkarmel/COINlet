@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
+import com.coinlet.Validator
 import com.coinlet.databinding.ActivityFirstRegisterStepBinding
 
 
@@ -80,10 +81,27 @@ class FirstRegisterStep : AppCompatActivity() {
     }
 
             binding.btnNext.setOnClickListener {
-            val nationality = binding.spinnerNationality.selectedItem.toString()
-            val intent = Intent(this, SecondStepRegister::class.java)
-            intent.putExtra("nationality", nationality)
-            startActivity(intent)
+                if(validateForm()) {
+                    val nationality = binding.spinnerNationality.selectedItem.toString()
+                    val intent = Intent(this, SecondStepRegister::class.java)
+                    intent.putExtra("nationality", nationality)
+                    startActivity(intent)
+                }
         }
+
+
 }
+    private fun validateForm(): Boolean{
+        var isValid = true
+
+        if(!Validator.validateCheckbox(binding.checkBoxAge.isChecked)){
+            binding.checkBoxAge.error = "Wymagane jest ukończony 18 rok życia!"
+//            Toast.makeText(this, "Wymagane jest ukończony 18 rok życia.", Toast.LENGTH_SHORT).show()
+            isValid = false;
+        }
+        else{
+            binding.checkBoxAge.error = null
+        }
+        return isValid
+    }
 }
