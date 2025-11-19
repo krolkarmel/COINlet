@@ -45,9 +45,6 @@
             android:name=".register.ThirdRegisterStep"
             android:exported="false" />
         <activity
-            android:name=".register.SecondRegisterStep"
-            android:exported="false" />
-        <activity
             android:name=".register.FirstRegisterStep"
             android:exported="true" />
         <activity
