@@ -157,6 +157,8 @@ class SecondStepRegister : AppCompatActivity() {
             intent.putExtra("resendToken", token)
             intent.putExtra("nationality", nationality)
             intent.putExtra("phoneNumber", phoneNumber)
+            intent.putExtra("mode", "register")
+
             startActivity(intent)
         }
     }

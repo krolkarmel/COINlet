@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
+import com.coinlet.app.Dashboard
 import com.coinlet.databinding.ActivityConfirmCodeRegisterStepBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -35,6 +36,7 @@ class ConfirmCodeRegisterStep : AppCompatActivity() {
     private lateinit var resendToken : PhoneAuthProvider.ForceResendingToken
     private lateinit var phoneNumber : String
     private lateinit var nationality : String
+    private lateinit var mode : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,8 +52,10 @@ class ConfirmCodeRegisterStep : AppCompatActivity() {
 
         OTP = intent.getStringExtra("OTP").toString()
         resendToken = intent.getParcelableExtra("resendToken")!!
-        phoneNumber = intent.getStringExtra("phoneNumber")!!
-        nationality = intent.getStringExtra("nationality")!!
+        mode = intent.getStringExtra("mode") ?: "register"
+
+
+
 
 
         init()
@@ -134,6 +138,18 @@ class ConfirmCodeRegisterStep : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+                    if(mode == "login") {
+                        val intent = Intent(this, Dashboard::class.java).apply {
+                           // putExtra("nationalityFromDb", nationalityFromDb)
+                           // putExtra("phoneNumberFromDb", phoneNumberFromDb)
+                        }
+                        startActivity(intent)
+                        finish()
+
+
+                    }else if(mode == "register"){
+                        phoneNumber = intent.getStringExtra("phoneNumber")!!
+                        nationality = intent.getStringExtra("nationality")!!
                     Toast.makeText(
                         this,
                         "Numer telefonu został zweryfikowany",
@@ -146,6 +162,7 @@ class ConfirmCodeRegisterStep : AppCompatActivity() {
                     }
                     startActivity(intent)
                     finish()
+                        }
                 } else {
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
                         Toast.makeText(
