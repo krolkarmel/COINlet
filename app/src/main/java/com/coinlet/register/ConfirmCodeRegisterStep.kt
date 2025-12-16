@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.graphics.Path
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
@@ -135,50 +136,70 @@ class ConfirmCodeRegisterStep : AppCompatActivity() {
 
     }
     private fun verifyCode(credential: PhoneAuthCredential) {
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
                     if(mode == "login") {
-                        val intent = Intent(this, Dashboard::class.java).apply {
-                           // putExtra("nationalityFromDb", nationalityFromDb)
-                           // putExtra("phoneNumberFromDb", phoneNumberFromDb)
+                        val user = FirebaseAuth.getInstance().currentUser
+                        if (user == null) {
+                            Toast.makeText(this, "Brak zalogowanego użytkownika. Zaloguj się ponownie.", Toast.LENGTH_SHORT).show()
+                            return
                         }
-                        startActivity(intent)
-                        finish()
+                        user.reauthenticate(credential)
+                            .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val intent = Intent(this, Dashboard::class.java).apply {
+                                    // putExtra("nationalityFromDb", nationalityFromDb)
+                                    // putExtra("phoneNumberFromDb", phoneNumberFromDb)
+                                }
+                                startActivity(intent)
+                                finish()
+                            }
 
-
-                    }else if(mode == "register"){
-                        phoneNumber = intent.getStringExtra("phoneNumber")!!
-                        nationality = intent.getStringExtra("nationality")!!
-                    Toast.makeText(
-                        this,
-                        "Numer telefonu został zweryfikowany",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    val intent = Intent(this, ThirdRegisterStep::class.java).apply {
-                        putExtra("nationality", nationality)
-                        putExtra("phoneNumber", phoneNumber)
-                    }
-                    startActivity(intent)
-                    finish()
+                        else {
+                            if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                                Toast.makeText(
+                                    this,
+                                    "Nieprawidłowy kod weryfikacyjny",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
-                } else {
-                    if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                        Toast.makeText(
-                            this,
-                            "Nieprawidłowy kod weryfikacyjny",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        Toast.makeText(
-                            this,
-                            "Błąd weryfikacji: ${task.exception?.localizedMessage}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                            }
                     }
-                }
-            }
+                    else if(mode == "register") {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        if (user == null) {
+                            Toast.makeText(this, "Brak zalogowanego użytkownika. Dokończ rejestrację od początku.", Toast.LENGTH_SHORT).show()
+                            return
+                        }
+                        user.linkWithCredential(credential)
+                            .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                phoneNumber = intent.getStringExtra("phoneNumber")!!
+                                nationality = intent.getStringExtra("nationality")!!
+                                Toast.makeText(
+                                    this,
+                                    "Numer telefonu został zweryfikowany",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                val intent = Intent(this, ThirdRegisterStep::class.java).apply {
+                                    putExtra("nationality", nationality)
+                                    putExtra("phoneNumber", phoneNumber)
+                                }
+                                startActivity(intent)
+                                finish()
+                            }
+
+                        else {
+                                if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                                    Toast.makeText(
+                                        this,
+                                        "Nieprawidłowy kod weryfikacyjny",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.coinlet.register
 
+import android.R.attr.phoneNumber
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -11,9 +12,11 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
+import com.coinlet.app.SplashScreen.Companion.auth
 import com.coinlet.databinding.ActivitySecondStepRegisterBinding
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -77,11 +80,11 @@ class SecondStepRegister : AppCompatActivity() {
 
         init()
 
-        btnSendCode.setOnClickListener{
+        btnSendCode.setOnClickListener {
 
             phoneNumber = phoneNumberInputText.text.trim().toString()
-            if (phoneNumber.isNotEmpty()){
-                if(phoneNumber.length in 7..12){
+            if (phoneNumber.isNotEmpty()) {
+                if (phoneNumber.length in 7..12) {
                     val selected = binding.numberSpinner.selectedItem.toString()
                     val parts = selected.split(" ")
                     val numberPrefix = parts.last()
@@ -93,15 +96,28 @@ class SecondStepRegister : AppCompatActivity() {
                         .setActivity(this) // Activity (for callback binding)
                         .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
                         .build()
-                    PhoneAuthProvider.verifyPhoneNumber(options)
 
-                }else{
-                    Toast.makeText(this, "Podaj właściwy numer telefonu!", Toast.LENGTH_SHORT).show()
+                    if (auth.currentUser == null) {
+                        auth.signInAnonymously()
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    PhoneAuthProvider.verifyPhoneNumber(options)
+                                } else {
+                                    Toast.makeText(
+                                        this,
+                                        "Nie udało się rozpocząć rejestracji: ${task.exception?.localizedMessage}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                    } else {
+                        PhoneAuthProvider.verifyPhoneNumber(options)
+                    }
+
+                    }
                 }
-            }else{
-                Toast.makeText(this, "Podaj numer telefonu!", Toast.LENGTH_SHORT).show()
             }
-        }
+
 
 
 //        binding.btnSendCode.setOnClickListener {

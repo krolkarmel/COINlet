@@ -63,7 +63,7 @@ class Login : AppCompatActivity() {
                                         nationalityFromDb =
                                             doc.getString("nationality") ?: ""
 
-                                        Toast.makeText(this, "PHONE='$phoneNumberFromDb'", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(this, "Wysłano kod SMS", Toast.LENGTH_LONG).show()
 
                                         val options = PhoneAuthOptions.newBuilder(auth)
                                             .setPhoneNumber(phoneNumberFromDb) // Phone number to verify

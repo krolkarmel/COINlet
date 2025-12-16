@@ -65,7 +65,14 @@ class FifthRegisterStep : AppCompatActivity() {
 
 
                 if (email.isNotEmpty() && password.isNotEmpty()) {
-                    auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+
+                    val user = FirebaseAuth.getInstance().currentUser
+                    if (user == null) {
+                        Toast.makeText(this, "Brak sesji rejestracji. Zacznij od początku.", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    val emailCredential = com.google.firebase.auth.EmailAuthProvider.getCredential(email, password)
+                    user.linkWithCredential(emailCredential).addOnCompleteListener {
                         if (it.isSuccessful) {
                             val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
