@@ -1,13 +1,18 @@
 package com.coinlet.login
 
+import androidx.biometric.BiometricPrompt
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
+import com.coinlet.app.Dashboard
 import com.coinlet.app.SplashScreen
 import com.coinlet.databinding.ActivityLoginBinding
 import com.coinlet.register.ConfirmCodeRegisterStep
@@ -20,13 +25,20 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
+import kotlin.jvm.java
+
 
 class Login : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var phoneNumberFromDb: String
     private lateinit var nationalityFromDb: String
+    private lateinit var executor : Executor
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: androidx.biometric.BiometricPrompt.PromptInfo
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -83,7 +95,45 @@ class Login : AppCompatActivity() {
 
             }
         }
-    }
+
+
+//        logowanie biometryczne
+
+            executor = ContextCompat.getMainExecutor(this)
+
+        biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    Toast.makeText(applicationContext, "Błąd: $errString", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    Toast.makeText(applicationContext, "Zalogowano odciskiem palca!", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@Login, Dashboard::class.java))
+                    finish()
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    Toast.makeText(applicationContext, "Nieudana autoryzacja", Toast.LENGTH_SHORT).show()
+                }
+            })
+
+
+        promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Logowanie biometryczne")
+            .setSubtitle("Użyj odcisku palca do logowania")
+            .setNegativeButtonText("Anuluj")
+            .build()
+
+
+        binding.btnFingerprint.setOnClickListener {
+            biometricPrompt.authenticate(promptInfo)
+        }
+
+        }
 
 
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
