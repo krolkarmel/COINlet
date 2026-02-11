@@ -54,4 +54,8 @@ object Validator {
     fun doPasswordsMatch(password: String, confirmPassword: String): Boolean {
         return password == confirmPassword
     }
+    fun isPinGood(pin: String): Boolean{
+        val regex = Regex("^\\d{4}\$")
+        return regex.matches(pin)
+    }
 }

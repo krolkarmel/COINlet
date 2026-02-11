@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/lockRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    tools:context=".applock.LockActivity">
+
+    <ImageView
+        android:id="@+id/logo1"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:contentDescription="@string/logo_coinllet"
+        android:src="@drawable/logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@null"
+        android:contentDescription="@string/back_id"
+        android:scaleType="centerInside"
+        android:src="@drawable/back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- DOLNY PASEK OPCJI -->
+    <LinearLayout
+        android:id="@+id/unlockOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnFingerprint"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginEnd="8dp"
+            android:background="@null"
+            android:contentDescription="@string/finger_id"
+            android:scaleType="centerInside"
+            android:src="@drawable/finger" />
+
+        <ImageButton
+            android:id="@+id/btnFace"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:background="@null"
+            android:contentDescription="@string/face_id"
+            android:scaleType="centerInside"
+            android:src="@drawable/face" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contentContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/logo1"
+        app:layout_constraintBottom_toTopOf="@id/unlockOptions"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.5">
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Odblokuj aplikację"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/subtitleTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="center"
+            android:text="Wpisz PIN lub użyj biometrii, aby kontynuować."
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@+id/titleTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/errorTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text=""
+            android:textSize="14sp"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/subtitleTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/pinRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/errorTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <EditText
+                android:id="@+id/pin1"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:hint="•"
+                android:inputType="numberPassword"
+                android:maxLength="1"
+                android:textSize="20sp"
+                android:imeOptions="actionNext"
+                android:importantForAutofill="no"
+                android:autofillHints="" />
+
+            <EditText
+                android:id="@+id/pin2"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:hint="•"
+                android:inputType="numberPassword"
+                android:maxLength="1"
+                android:textSize="20sp"
+                android:imeOptions="actionNext"
+                android:importantForAutofill="no"
+                android:autofillHints="" />
+
+            <EditText
+                android:id="@+id/pin3"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:hint="•"
+                android:inputType="numberPassword"
+                android:maxLength="1"
+                android:textSize="20sp"
+                android:imeOptions="actionNext"
+                android:importantForAutofill="no"
+                android:autofillHints="" />
+
+            <EditText
+                android:id="@+id/pin4"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:gravity="center"
+                android:hint="•"
+                android:inputType="numberPassword"
+                android:maxLength="1"
+                android:textSize="20sp"
+                android:imeOptions="actionDone"
+                android:importantForAutofill="no"
+                android:autofillHints="" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnUnlock"
+            android:layout_width="240dp"
+            android:layout_height="55dp"
+            android:layout_marginTop="18dp"
+            android:backgroundTint="#C3A922"
+            android:text="Odblokuj"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/pinRow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

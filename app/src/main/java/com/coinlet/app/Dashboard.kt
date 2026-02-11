@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
+import com.coinlet.applock.EnterPinActivity
 import com.coinlet.databinding.ActivityDashboardBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -42,6 +43,7 @@ class Dashboard : AppCompatActivity() {
         binding.btnUserProfile.setOnClickListener {view ->
             showPopup(view)
         }
+
 
         val userId = FirebaseAuth.getInstance().currentUser!!.uid
 

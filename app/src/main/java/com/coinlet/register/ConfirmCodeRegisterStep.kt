@@ -10,22 +10,21 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.graphics.Path
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
-import com.coinlet.app.Dashboard
+import com.coinlet.app.SplashScreen
 import com.coinlet.databinding.ActivityConfirmCodeRegisterStepBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 
 class ConfirmCodeRegisterStep : AppCompatActivity() {
+
     private lateinit var binding: ActivityConfirmCodeRegisterStepBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var btnConfirmCode: Button
-//    private lateinit var resendTV: TextView
+
     private lateinit var code1: EditText
     private lateinit var code2: EditText
     private lateinit var code3: EditText
@@ -33,38 +32,35 @@ class ConfirmCodeRegisterStep : AppCompatActivity() {
     private lateinit var code5: EditText
     private lateinit var code6: EditText
 
-    private lateinit var OTP : String
-    private lateinit var resendToken : PhoneAuthProvider.ForceResendingToken
-    private lateinit var phoneNumber : String
-    private lateinit var nationality : String
-    private lateinit var mode : String
+    private lateinit var OTP: String
+    private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
+    private lateinit var phoneNumber: String
+    private lateinit var nationality: String
+    private lateinit var mode: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityConfirmCodeRegisterStepBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-
-        OTP = intent.getStringExtra("OTP").toString()
+        OTP = intent.getStringExtra("OTP").orEmpty()
         resendToken = intent.getParcelableExtra("resendToken")!!
         mode = intent.getStringExtra("mode") ?: "register"
 
-
-
-
-
         init()
-
         addTextChangeListener()
+
         binding.btnConfirmCode.setOnClickListener {
             val typedOTP = (code1.text.toString() + code2.text.toString() + code3.text.toString()
                     + code4.text.toString() + code5.text.toString() + code6.text.toString())
+
             if (typedOTP.isEmpty()) {
                 Toast.makeText(this, "Wprowadź kod", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -79,26 +75,19 @@ class ConfirmCodeRegisterStep : AppCompatActivity() {
                 PhoneAuthProvider.getCredential(OTP, typedOTP)
 
             verifyCode(credential)
-
-
-//        binding.btnConfirmCode.setOnClickListener {
-//            val nationality = intent.getStringExtra("nationality") ?: ""
-//            val phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
-//            val intent = Intent(this, ThirdRegisterStep::class.java)
-//            intent.putExtra("nationality", nationality)
-//            intent.putExtra("phoneNumber", phoneNumber)
-//            startActivity(intent)
         }
     }
 
-    private fun addTextChangeListener(){
+    private fun addTextChangeListener() {
         code1.addTextChangedListener(EditTextWatcher(code1))
         code2.addTextChangedListener(EditTextWatcher(code2))
         code3.addTextChangedListener(EditTextWatcher(code3))
         code4.addTextChangedListener(EditTextWatcher(code4))
         code5.addTextChangedListener(EditTextWatcher(code5))
-        code6.addTextChangedListener(EditTextWatcher(code6)) }
-    private fun init(){
+        code6.addTextChangedListener(EditTextWatcher(code6))
+    }
+
+    private fun init() {
         auth = FirebaseAuth.getInstance()
         btnConfirmCode = findViewById(R.id.btnConfirmCode)
         code1 = binding.code1
@@ -107,99 +96,52 @@ class ConfirmCodeRegisterStep : AppCompatActivity() {
         code4 = binding.code4
         code5 = binding.code5
         code6 = binding.code6
-    } // resendCode = findViewById() code1 = findViewById(R.id.code1) code2 = findViewById(R.id.code2) code3 = findViewById(R.id.code3) code4 = findViewById(R.id.code4) code5 = findViewById(R.id.code5) code6 = findViewById(R.id.code6) }
-
-    inner class EditTextWatcher(private val view : View) : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                val text = s.toString()
-                when(view.id){
-                    R.id.code1 -> if(text.length == 1) code2.requestFocus()
-                    R.id.code2 -> if(text.length == 1) code3.requestFocus() else if (text.isEmpty()) code1.requestFocus()
-                    R.id.code3 -> if(text.length == 1) code4.requestFocus() else if (text.isEmpty()) code2.requestFocus()
-                    R.id.code4 -> if(text.length == 1) code5.requestFocus() else if (text.isEmpty()) code3.requestFocus()
-                    R.id.code5 -> if(text.length == 1) code6.requestFocus() else if (text.isEmpty()) code4.requestFocus()
-                    R.id.code6 -> if(text.isEmpty()) code5.requestFocus() } }
-
-        override fun beforeTextChanged(
-            s: CharSequence?,
-            start: Int, count: Int,
-            after: Int ) {
-
-        }
-
-        override fun onTextChanged(
-            s: CharSequence?, start: Int,
-            before: Int,
-            count: Int ) {
-
-        }
-
     }
+
+    inner class EditTextWatcher(private val view: View) : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            val text = s.toString()
+            when (view.id) {
+                R.id.code1 -> if (text.length == 1) code2.requestFocus()
+                R.id.code2 -> if (text.length == 1) code3.requestFocus() else if (text.isEmpty()) code1.requestFocus()
+                R.id.code3 -> if (text.length == 1) code4.requestFocus() else if (text.isEmpty()) code2.requestFocus()
+                R.id.code4 -> if (text.length == 1) code5.requestFocus() else if (text.isEmpty()) code3.requestFocus()
+                R.id.code5 -> if (text.length == 1) code6.requestFocus() else if (text.isEmpty()) code4.requestFocus()
+                R.id.code6 -> if (text.isEmpty()) code5.requestFocus()
+            }
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    }
+
     private fun verifyCode(credential: PhoneAuthCredential) {
-                    if(mode == "login") {
-                        val user = FirebaseAuth.getInstance().currentUser
-                        if (user == null) {
-                            Toast.makeText(this, "Brak zalogowanego użytkownika. Zaloguj się ponownie.", Toast.LENGTH_SHORT).show()
-                            return
-                        }
-                        user.reauthenticate(credential)
-                            .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val intent = Intent(this, Dashboard::class.java).apply {
-                                    // putExtra("nationalityFromDb", nationalityFromDb)
-                                    // putExtra("phoneNumberFromDb", phoneNumberFromDb)
-                                }
-                                startActivity(intent)
-                                finish()
-                            }
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Toast.makeText(
+                        this,
+                        "Błąd weryfikacji: ${task.exception?.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@addOnCompleteListener
+                }
 
-                        else {
-                            if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                                Toast.makeText(
-                                    this,
-                                    "Nieprawidłowy kod weryfikacyjny",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                            }
-                    }
-                    else if(mode == "register") {
-                        val user = FirebaseAuth.getInstance().currentUser
-                        if (user == null) {
-                            Toast.makeText(this, "Brak zalogowanego użytkownika. Dokończ rejestrację od początku.", Toast.LENGTH_SHORT).show()
-                            return
-                        }
-                        user.linkWithCredential(credential)
-                            .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                phoneNumber = intent.getStringExtra("phoneNumber")!!
-                                nationality = intent.getStringExtra("nationality")!!
-                                Toast.makeText(
-                                    this,
-                                    "Numer telefonu został zweryfikowany",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                if (mode == "login") {
+                    startActivity(Intent(this, SplashScreen::class.java))
+                    finish()
+                    return@addOnCompleteListener
+                }
 
-                                val intent = Intent(this, ThirdRegisterStep::class.java).apply {
-                                    putExtra("nationality", nationality)
-                                    putExtra("phoneNumber", phoneNumber)
-                                }
-                                startActivity(intent)
-                                finish()
-                            }
+                phoneNumber = intent.getStringExtra("phoneNumber").orEmpty()
+                nationality = intent.getStringExtra("nationality").orEmpty()
 
-                        else {
-                                if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                                    Toast.makeText(
-                                        this,
-                                        "Nieprawidłowy kod weryfikacyjny",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        }
-                    }
+                val i = Intent(this, ThirdRegisterStep::class.java).apply {
+                    putExtra("nationality", nationality)
+                    putExtra("phoneNumber", phoneNumber)
+                }
+                startActivity(i)
+                finish()
+            }
     }
-
 }
