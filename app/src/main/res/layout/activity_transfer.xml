@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".app.Dashboard">
+    tools:context=".app.TransferActivity">
 
     <ImageButton
         android:id="@+id/btnBack"
@@ -34,96 +34,149 @@
         android:id="@+id/textView11"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="COINlet"
         android:textColor="#C3A922"
         android:textSize="32sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/imageView3"
-        app:layout_constraintTop_toTopOf="@id/imageView3"
         app:layout_constraintBottom_toBottomOf="@id/imageView3"
-        android:layout_marginStart="8dp"/>
+        app:layout_constraintStart_toEndOf="@id/imageView3"
+        app:layout_constraintTop_toTopOf="@id/imageView3" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardTransfer"
-        android:layout_width="395dp"
-        android:layout_height="479dp"
-        android:layout_marginHorizontal="20dp"
+        android:layout_width="366dp"
+        android:layout_height="497dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="52dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="24dp"
         android:backgroundTint="#C3A922"
         app:cardCornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageView3">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="403dp"
-            android:layout_height="match_parent">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textInputEditText4"
-                android:layout_width="340dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="32dp"
-                android:hint="Tytuł"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputEditText3" />
+            android:layout_width="match_parent"
+            android:layout_height="520dp"
+            android:padding="18dp">
 
             <TextView
-                android:id="@+id/textView15"
-                android:layout_width="205dp"
-                android:layout_height="43dp"
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:text="Przelew zwykły"
+                android:textColor="#111111"
                 android:textSize="28sp"
                 android:textStyle="bold"
-                tools:layout_editor_absoluteX="99dp"
-                tools:layout_editor_absoluteY="5dp" />
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textInputEditText"
-                android:layout_width="340dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="32dp"
-                android:hint="Odbiorca"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView15" />
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textInputEditText2"
-                android:layout_width="340dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="32dp"
-                android:hint="Numer konta"
+            <ScrollView
+                android:id="@+id/scroll"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="14dp"
+                android:fillViewport="true"
+                app:layout_constraintBottom_toTopOf="@id/btnSendTransfer"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputEditText" />
+                app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textInputEditText3"
-                android:layout_width="340dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="32dp"
-                android:hint="Kwota"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputEditText2" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilRecipient"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Odbiorca"
+                        app:boxBackgroundMode="outline">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etReceiver"
+                            android:layout_width="match_parent"
+                            android:layout_height="108dp"
+                            android:inputType="textPersonName"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilAccount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="Numer konta"
+                        app:boxBackgroundMode="outline"
+                        app:endIconMode="clear_text">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etIban"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textNoSuggestions"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilAmount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="Kwota"
+                        app:boxBackgroundMode="outline"
+                        app:prefixText="PLN ">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAmount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilTitleField"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="Tytuł"
+                        app:boxBackgroundMode="outline">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapSentences"
+                            android:maxLines="2" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp" />
+
+                </LinearLayout>
+            </ScrollView>
 
             <Button
-                android:id="@+id/button"
-                android:layout_width="wrap_content"
+                android:id="@+id/btnSendTransfer"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:backgroundTint="#333333"
-                android:textColor="#C3A922"
+                android:layout_marginBottom="12dp"
                 android:text="Wykonaj przelew"
+                android:textColor="#C3A922"
+                app:backgroundTint="#333333"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputEditText4" />
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.cardview.widget.CardView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

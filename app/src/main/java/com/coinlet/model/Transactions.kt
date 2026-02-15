@@ -1,13 +1,10 @@
 package com.coinlet.model
 
 data class Transactions(
-    val transactionId : String = "",
-    val userId : String = "",
-    val accountId : String = "",
-    val toAccount : String = "",
-    val amount : Double = 0.0,
-    val currency : String = "PLN",
-    val title : String = "",
-    val dateTransaction : String = "",
-    val type : String = "",
+    val amount: Double = 0.0,
+    val receiverName: String = "",
+    val receiverIban: String = "",
+    val title: String = "",
+    val date: Long = System.currentTimeMillis(),
+    val type: String = "outgoing"
 )

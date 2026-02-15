@@ -39,6 +39,8 @@ class FourthRegisterStep : AppCompatActivity() {
                 val birthDate = intent.getStringExtra("birthDate") ?: ""
                 val pesel = intent.getStringExtra("pesel") ?: ""
                 val email = intent.getStringExtra("email") ?: ""
+                val idPhoto1Uri = intent.getStringExtra("idPhoto1Uri") ?: ""
+                val idPhoto2Uri = intent.getStringExtra("idPhoto2Uri") ?: ""
                 val intent = Intent(this, FifthRegisterStep::class.java)
                 intent.putExtra("nationality", nationality)
                 intent.putExtra("phoneNumber", phoneNumber)
@@ -53,6 +55,8 @@ class FourthRegisterStep : AppCompatActivity() {
                 intent.putExtra("postalCode", postalCode)
                 intent.putExtra("houseNumber", houseNumber)
                 intent.putExtra("country", country)
+                intent.putExtra("idPhoto1Uri", idPhoto1Uri)
+                intent.putExtra("idPhoto2Uri", idPhoto2Uri)
                 startActivity(intent)
             }
         }

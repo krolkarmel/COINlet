@@ -41,24 +41,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageButton
-            android:id="@+id/btnFingerprint"
-            android:layout_width="55dp"
+        <Button
+            android:id="@+id/btnBiometric"
+            android:layout_width="240dp"
             android:layout_height="55dp"
-            android:layout_marginEnd="8dp"
-            android:background="@null"
-            android:contentDescription="@string/finger_id"
-            android:scaleType="centerInside"
-            android:src="@drawable/finger" />
+            android:layout_marginTop="12dp"
+            android:text="Użyj biometrii"
+            android:textSize="18sp"
+            android:backgroundTint="#2F2F2F"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@+id/btnUnlock"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <ImageButton
-            android:id="@+id/btnFace"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:background="@null"
-            android:contentDescription="@string/face_id"
-            android:scaleType="centerInside"
-            android:src="@drawable/face" />
+
+        <!--        <ImageButton-->
+<!--            android:id="@+id/btnFingerprint"-->
+<!--            android:layout_width="55dp"-->
+<!--            android:layout_height="55dp"-->
+<!--            android:layout_marginEnd="8dp"-->
+<!--            android:background="@null"-->
+<!--            android:contentDescription="@string/finger_id"-->
+<!--            android:scaleType="centerInside"-->
+<!--            android:src="@drawable/finger" />-->
+
+<!--        <ImageButton-->
+<!--            android:id="@+id/btnFace"-->
+<!--            android:layout_width="55dp"-->
+<!--            android:layout_height="55dp"-->
+<!--            android:background="@null"-->
+<!--            android:contentDescription="@string/face_id"-->
+<!--            android:scaleType="centerInside"-->
+<!--            android:src="@drawable/face" />-->
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

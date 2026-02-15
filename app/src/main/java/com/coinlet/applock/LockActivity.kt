@@ -21,6 +21,8 @@ import com.coinlet.databinding.ActivitySplashScreenBinding
 import com.coinlet.register.FirstRegisterStep
 import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.Executor
+import androidx.biometric.BiometricManager
+
 
 class LockActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLockBinding
@@ -31,6 +33,7 @@ class LockActivity : AppCompatActivity() {
     private lateinit var pin2: EditText
     private lateinit var pin3: EditText
     private lateinit var pin4: EditText
+    private var biometricLaunched = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -94,6 +97,13 @@ class LockActivity : AppCompatActivity() {
             .setNegativeButtonText("Anuluj")
             .build()
 
+
+        val prefs = AppLockPrefs(this)
+        if (prefs.isBiometricsEnabled() && canAuth() && !biometricLaunched) {
+            biometricLaunched = true
+            biometricPrompt.authenticate(promptInfo)
+        }
+
         binding.btnUnlock.setOnClickListener {
             val typedPin = getTypedPin()
 
@@ -136,17 +146,8 @@ class LockActivity : AppCompatActivity() {
 
         }
 
-        binding.btnFingerprint.setOnClickListener {
-            val prefs = AppLockPrefs(this)
-            if (prefs.isBiometricsEnabled()) {
-                biometricPrompt.authenticate(promptInfo)
-            }else {
-                binding.errorTextView.visibility = View.VISIBLE
-                binding.errorTextView.text = "Biometria nie jest włączona na tym urządzeniu."
-            }
-        }
 
-        binding.btnFace.setOnClickListener {
+        binding.btnBiometric.setOnClickListener {
             val prefs = AppLockPrefs(this)
             if (prefs.isBiometricsEnabled()) {
                 biometricPrompt.authenticate(promptInfo)
@@ -195,5 +196,15 @@ class LockActivity : AppCompatActivity() {
     private fun getTypedPin(): String {
         return pin1.text.toString() + pin2.text.toString() + pin3.text.toString() + pin4.text.toString()
     }
+
+
+    private fun canAuth(): Boolean {
+        val result = BiometricManager.from(this).canAuthenticate(
+            BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        )
+        return result == BiometricManager.BIOMETRIC_SUCCESS
+    }
+
 
 }

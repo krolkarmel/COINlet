@@ -1,6 +1,7 @@
 package com.coinlet.register
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -17,9 +18,12 @@ import com.coinlet.model.Address
 import com.coinlet.model.UserData
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import java.security.SecureRandom
+import com.google.firebase.storage.FirebaseStorage
+
 
 class FifthRegisterStep : AppCompatActivity() {
 
@@ -81,7 +85,6 @@ class FifthRegisterStep : AppCompatActivity() {
                 isVerified = false,
             )
 
-            // ✅ Jeśli provider email/password już jest, nie linkuj drugi raz
             val alreadyHasEmailProvider = user.providerData.any { it.providerId == "password" }
             if (alreadyHasEmailProvider) {
                 saveUserProfileAndAccount(userData)
@@ -132,7 +135,6 @@ class FifthRegisterStep : AppCompatActivity() {
             "appLockEnabled" to false,
             "trustedDevices" to hashMapOf<String, Any>(),
 
-            "trustedDevices.$deviceId" to true,
             "needsAppLockSetup" to true
 
         )
@@ -156,9 +158,12 @@ class FifthRegisterStep : AppCompatActivity() {
 
                 accountRef.set(account)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Pomyślnie utworzono konto!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this, FinishRegisterStep::class.java))
-                        finish()
+                        saveKycAuth(userId) {
+                            Toast.makeText(this, "Pomyślnie utworzono konto!", Toast.LENGTH_SHORT)
+                                .show()
+                            startActivity(Intent(this, FinishRegisterStep::class.java))
+                            finish()
+                        }
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(this, "Błąd konta: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
@@ -170,6 +175,49 @@ class FifthRegisterStep : AppCompatActivity() {
                 Toast.makeText(this, "Firestore error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
                 startActivity(Intent(this, SplashScreen::class.java))
                 finish()
+            }
+    }
+
+    private fun saveKycAuth(userId: String, onDone: () -> Unit) {
+        val idPhoto1UriStr = intent.getStringExtra("idPhoto1Uri") ?: ""
+        val idPhoto2UriStr = intent.getStringExtra("idPhoto2Uri") ?: ""
+
+        if (idPhoto1UriStr.isBlank() || idPhoto2UriStr.isBlank()) {
+            Toast.makeText(this, "Brak zdjęć dowodu do wysłania.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val uri1 = Uri.parse(idPhoto1UriStr)
+        val uri2 = Uri.parse(idPhoto2UriStr)
+
+        val storage = FirebaseStorage.getInstance()
+        val ref1 = storage.reference.child("users/$userId/kyc/photo1.jpg")
+        val ref2 = storage.reference.child("users/$userId/kyc/photo2.jpg")
+
+        ref1.putFile(uri1)
+            .addOnSuccessListener {
+                ref2.putFile(uri2)
+                    .addOnSuccessListener {
+                        val kycPayload = mapOf(
+                            "kycStatus" to "SUBMITTED",
+                            "kycPhoto1Path" to "users/$userId/kyc/photo1.jpg",
+                            "kycPhoto2Path" to "users/$userId/kyc/photo2.jpg",
+                            "kycSubmittedAt" to FieldValue.serverTimestamp()
+                        )
+
+                        db.collection("users").document(userId)
+                            .set(kycPayload, SetOptions.merge())
+                            .addOnSuccessListener { onDone() }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "Błąd zapisu KYC: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                            }
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Upload photo2 nieudany: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                    }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Upload photo1 nieudany: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
     }
 

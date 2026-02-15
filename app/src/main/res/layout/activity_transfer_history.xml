@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".app.Dashboard">
+    tools:context=".transfers.TransferHistoryActivity">
 
     <ImageButton
         android:id="@+id/btnBack"
@@ -34,45 +34,92 @@
         android:id="@+id/textView11"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="COINlet"
         android:textColor="#C3A922"
         android:textSize="32sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/imageView3"
-        app:layout_constraintTop_toTopOf="@id/imageView3"
         app:layout_constraintBottom_toBottomOf="@id/imageView3"
-        android:layout_marginStart="8dp"/>
+        app:layout_constraintStart_toEndOf="@id/imageView3"
+        app:layout_constraintTop_toTopOf="@id/imageView3" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardTransfer"
-        android:layout_width="407dp"
-        android:layout_height="580dp"
-        android:layout_marginHorizontal="20dp"
+        android:id="@+id/cardHistory"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginTop="52dp"
+        android:layout_marginBottom="24dp"
         android:backgroundTint="#C3A922"
         app:cardCornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageView3">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="411dp"
-            android:layout_height="582dp">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="18dp">
 
             <TextView
-                android:id="@+id/textView15"
-                android:layout_width="261dp"
-                android:layout_height="53dp"
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:text="Historia transakcji"
                 android:textAlignment="center"
                 android:textSize="28sp"
                 android:textStyle="bold"
-                tools:layout_editor_absoluteX="71dp"
-                tools:layout_editor_absoluteY="7dp" />
+                android:textColor="#111111"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvHistory"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="14dp"
+                android:clipToPadding="false"
+                android:paddingBottom="8dp"
+                tools:listitem="@layout/item_history"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@id/rvHistory"
+                app:layout_constraintEnd_toEndOf="@id/rvHistory"
+                app:layout_constraintStart_toStartOf="@id/rvHistory"
+                app:layout_constraintTop_toTopOf="@id/rvHistory">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Brak transakcji"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#111111" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Gdy wykonasz przelew, pojawi się tutaj."
+                    android:alpha="0.75"
+                    android:textColor="#111111" />
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.cardview.widget.CardView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
