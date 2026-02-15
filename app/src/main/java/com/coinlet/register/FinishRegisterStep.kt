@@ -30,10 +30,12 @@ class FinishRegisterStep : AppCompatActivity() {
 
 
         binding.btnGoMenu.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
             startActivity(Intent(this, SplashScreen::class.java))
         }
 
         binding.btnLogin.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
             startActivity(Intent(this, Login::class.java))
         }
     }

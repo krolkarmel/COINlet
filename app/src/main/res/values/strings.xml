@@ -17,6 +17,8 @@
     <string name="wyslij_kod">Wyślij kod</string>
     <string name="na_ten_numer_wyslny_zostanie_kod_potwierdzajacy">Na ten numer wysłany zostanie kod potwierdzający.</string>
     <string name="krok_2_z_6">Krok 2 z 6</string>
+    <string name="clear_id">\n</string>
+    <string name="cd_back" />
 
     <string-array name="languages">
         <item>-PL- Polski</item>

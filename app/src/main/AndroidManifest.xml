@@ -3,7 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,6 +19,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.C0inlet"
         tools:targetApi="31">
+        <activity
+            android:name=".app.AcitivtyUserProfile"
+            android:exported="false" />
+        <activity
+            android:name=".applock.LockActivity"
+            android:exported="false" />
+        <activity
+            android:name=".applock.EnterPinActivity"
+            android:exported="false" />
+        <activity
+            android:name=".applock.BiometricSetupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".applock.ConfirmPinActivity"
+            android:exported="false" />
         <activity
             android:name=".app.TransferHistory"
             android:exported="false" />
@@ -59,6 +79,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

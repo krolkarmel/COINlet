@@ -10,10 +10,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.coinlet.R
+import com.coinlet.applock.EnterPinActivity
 import com.coinlet.databinding.ActivityDashboardBinding
+import com.coinlet.model.Transactions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class Dashboard : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
@@ -42,6 +46,14 @@ class Dashboard : AppCompatActivity() {
         binding.btnUserProfile.setOnClickListener {view ->
             showPopup(view)
         }
+
+        binding.rvLastTransactions.layoutManager = LinearLayoutManager(this)
+        val lastAdapter = TransferHistoryAdapter()
+        binding.rvLastTransactions.adapter = lastAdapter
+
+        loadLastTransactions(lastAdapter)
+
+        loadIban()
 
         val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
@@ -88,4 +100,56 @@ class Dashboard : AppCompatActivity() {
 
         popup.show()
     }
+    private fun loadIban() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users")
+            .document(uid)
+            .collection("accounts")
+            .limit(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.isEmpty) {
+                    val doc = snapshot.documents[0]
+                    val iban = doc.getString("accountNumber") ?: ""
+                    binding.ibanTextView.text =
+                        if (iban.isNotBlank()) "IBAN: $iban" else "IBAN: —"
+                } else {
+                    binding.ibanTextView.text = "IBAN: —"
+                }
+            }
+            .addOnFailureListener {
+                binding.ibanTextView.text = "IBAN: —"
+            }
+    }
+
+    private fun loadLastTransactions(adapter: TransferHistoryAdapter) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users").document(uid)
+            .collection("accounts")
+            .limit(1)
+            .get()
+            .addOnSuccessListener { accountsSnap ->
+                if (accountsSnap.isEmpty) {
+                    adapter.setData(emptyList())
+                    return@addOnSuccessListener
+                }
+
+                val accountRef = accountsSnap.documents.first().reference
+
+                accountRef.collection("transactions")
+                    .orderBy("date", Query.Direction.DESCENDING)
+                    .limit(3)
+                    .get()
+                    .addOnSuccessListener { txSnap ->
+                        val list = txSnap.documents.mapNotNull { it.toObject(Transactions::class.java) }
+                        adapter.setData(list)
+                    }
+            }
+    }
+
+
 }

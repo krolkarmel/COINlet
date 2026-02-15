@@ -1,18 +1,13 @@
 package com.coinlet.login
 
-import androidx.biometric.BiometricPrompt
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
-import com.coinlet.app.Dashboard
 import com.coinlet.app.SplashScreen
 import com.coinlet.databinding.ActivityLoginBinding
 import com.coinlet.register.ConfirmCodeRegisterStep
@@ -25,25 +20,22 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
-import kotlin.jvm.java
-
 
 class Login : AppCompatActivity() {
+
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var phoneNumberFromDb: String
     private lateinit var nationalityFromDb: String
-    private lateinit var executor : Executor
-    private lateinit var biometricPrompt: BiometricPrompt
-    private lateinit var promptInfo: androidx.biometric.BiometricPrompt.PromptInfo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -51,130 +43,109 @@ class Login : AppCompatActivity() {
         }
 
         auth = FirebaseAuth.getInstance()
+
         binding.btnBack.setOnClickListener {
             startActivity(Intent(this, SplashScreen::class.java))
+            finish()
         }
 
         binding.btnConfirmLogin.setOnClickListener {
-            val email = binding.textInputEmail.text.toString()
+            val email = binding.textInputEmail.text.toString().trim()
             val password = binding.textInputPassword.text.toString()
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                SplashScreen.auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
-                            val db = FirebaseFirestore.getInstance()
-                            db.collection("users")
-                                .document(userId)
-                                .get()
-                                .addOnSuccessListener { doc ->
-                                    if (doc.exists()) {
-                                        phoneNumberFromDb =
-                                            doc.getString("phoneNumber") ?: ""
-                                        nationalityFromDb =
-                                            doc.getString("nationality") ?: ""
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Podaj email i hasło.", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
 
-                                        Toast.makeText(this, "Wysłano kod SMS", Toast.LENGTH_LONG).show()
-
-                                        val options = PhoneAuthOptions.newBuilder(auth)
-                                            .setPhoneNumber(phoneNumberFromDb) // Phone number to verify
-                                            .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-                                            .setActivity(this) // Activity (for callback binding)
-                                            .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
-                                            .build()
-                                        PhoneAuthProvider.verifyPhoneNumber(options)
-
-                                    }
-                                }.addOnFailureListener {
-                                    Toast.makeText(this, it.localizedMessage, Toast.LENGTH_LONG)
-                                        .show()
-                                }
-                        }
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        Toast.makeText(
+                            this,
+                            "Błąd logowania: ${task.exception?.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        return@addOnCompleteListener
                     }
 
-            }
-        }
+                    val userId = FirebaseAuth.getInstance().currentUser?.uid
+                    if (userId == null) {
+                        Toast.makeText(this, "Brak sesji po logowaniu.", Toast.LENGTH_LONG).show()
+                        return@addOnCompleteListener
+                    }
 
+                    val db = FirebaseFirestore.getInstance()
+                    db.collection("users")
+                        .document(userId)
+                        .get()
+                        .addOnSuccessListener { doc ->
+                            if (!doc.exists()) {
+                                Toast.makeText(
+                                    this,
+                                    "Brak profilu użytkownika w bazie. Zarejestruj konto.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                return@addOnSuccessListener
+                            }
 
-//        logowanie biometryczne
+                            phoneNumberFromDb = doc.getString("phoneNumber") ?: ""
+                            nationalityFromDb = doc.getString("nationality") ?: ""
 
-            executor = ContextCompat.getMainExecutor(this)
+                            if (phoneNumberFromDb.isBlank()) {
+                                Toast.makeText(
+                                    this,
+                                    "Brak numeru telefonu w profilu – nie można wysłać SMS.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                return@addOnSuccessListener
+                            }
 
-        biometricPrompt = BiometricPrompt(this, executor,
-            object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    Toast.makeText(applicationContext, "Błąd: $errString", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Wysłano kod SMS", Toast.LENGTH_LONG).show()
+
+                            val options = PhoneAuthOptions.newBuilder(auth)
+                                .setPhoneNumber(phoneNumberFromDb)
+                                .setTimeout(60L, TimeUnit.SECONDS)
+                                .setActivity(this)
+                                .setCallbacks(callbacks)
+                                .build()
+
+                            PhoneAuthProvider.verifyPhoneNumber(options)
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(this, "Błąd bazy: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                        }
                 }
-
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    Toast.makeText(applicationContext, "Zalogowano odciskiem palca!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@Login, Dashboard::class.java))
-                    finish()
-                }
-
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                    Toast.makeText(applicationContext, "Nieudana autoryzacja", Toast.LENGTH_SHORT).show()
-                }
-            })
-
-
-        promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Logowanie biometryczne")
-            .setSubtitle("Użyj odcisku palca do logowania")
-            .setNegativeButtonText("Anuluj")
-            .build()
-
-
-        binding.btnFingerprint.setOnClickListener {
-            biometricPrompt.authenticate(promptInfo)
         }
-
-        }
-
+    }
 
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
         override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-            // This callback will be invoked in two situations:
-            // 1 - Instant verification. In some cases the phone number can be instantly
-            //     verified without needing to send or enter a verification code.
-            // 2 - Auto-retrieval. On some devices Google Play services can automatically
-            //     detect the incoming verification SMS and perform verification without
-            //     user action.
         }
 
         override fun onVerificationFailed(e: FirebaseException) {
-            // This callback is invoked in an invalid request for verification is made,
-            // for instance if the the phone number format is not valid.
-
-            if (e is FirebaseAuthInvalidCredentialsException) {
-                // Invalid request
-            } else if (e is FirebaseTooManyRequestsException) {
-                // The SMS quota for the project has been exceeded
-            } else if (e is FirebaseAuthMissingActivityForRecaptchaException) {
-                // reCAPTCHA verification attempted with null Activity
+            val msg = when (e) {
+                is FirebaseAuthInvalidCredentialsException -> "Nieprawidłowy numer telefonu w profilu."
+                is FirebaseTooManyRequestsException -> "Przekroczono limit SMS. Spróbuj później."
+                is FirebaseAuthMissingActivityForRecaptchaException -> "Błąd reCAPTCHA (brak Activity)."
+                else -> e.message ?: "Nieznany błąd weryfikacji."
             }
-
-            // Show a message and update the UI
+            Toast.makeText(this@Login, "Weryfikacja SMS nie powiodła się: $msg", Toast.LENGTH_LONG).show()
         }
 
         override fun onCodeSent(
             verificationId: String,
             token: PhoneAuthProvider.ForceResendingToken,
         ) {
-                        val intent = Intent(this@Login, ConfirmCodeRegisterStep::class.java)
-                        intent.putExtra("OTP", verificationId)
-                        intent.putExtra("resendToken", token)
-                        intent.putExtra("nationality", nationalityFromDb)
-                        intent.putExtra("phoneNumber", phoneNumberFromDb)
-                        intent.putExtra("mode", "login")
-
-                        startActivity(intent)
-                    }
-                }
+            val intent = Intent(this@Login, ConfirmCodeRegisterStep::class.java).apply {
+                putExtra("OTP", verificationId)
+                putExtra("resendToken", token)
+                putExtra("nationality", nationalityFromDb)
+                putExtra("phoneNumber", phoneNumberFromDb)
+                putExtra("mode", "login")
+            }
+            startActivity(intent)
         }
-
+    }
+}
