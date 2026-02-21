@@ -39,6 +39,15 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    packaging {
+        resources {
+            pickFirsts += setOf(
+                "META-INF/native-image/**",
+                "META-INF/LICENSE*",
+                "META-INF/NOTICE*"
+            )
+        }
+    }
 }
 
 dependencies {
@@ -64,4 +73,17 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-firestore")
 
+//    implementation("org.opencv:opencv:4.13.0")
+    implementation("org.bytedeco:javacv:1.5.12")
+
+    // Xiaomi = arm64, więc bierzemy tylko android-arm64
+    implementation("org.bytedeco:javacpp:1.5.12:android-arm64")
+    implementation("org.bytedeco:opencv:4.11.0-1.5.12:android-arm64")
+
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
+
+    implementation("com.google.guava:guava:32.1.3-android")
+    implementation("org.bytedeco:openblas:0.3.28-1.5.12:android-arm64")
 }

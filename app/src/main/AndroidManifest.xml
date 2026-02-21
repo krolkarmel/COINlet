@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -20,7 +21,22 @@
         android:theme="@style/Theme.C0inlet"
         tools:targetApi="31">
         <activity
-            android:name=".app.AcitivtyUserProfile"
+            android:name=".app.FaqItem"
+            android:exported="false" />
+        <activity
+            android:name=".faq.HelpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".faq.ContactActivity"
+            android:exported="false" />
+        <activity
+            android:name=".facelogin.FaceLoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".facelogin.FaceEnrollActivity"
+            android:exported="false" />
+        <activity
+            android:name=".app.ActivityUserProfile"
             android:exported="false" />
         <activity
             android:name=".applock.LockActivity"
@@ -79,6 +95,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

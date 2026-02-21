@@ -93,8 +93,11 @@ class LockActivity : AppCompatActivity() {
 
         promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Odblokowanie biometryczne")
-            .setSubtitle("Użyj odcisku palca / twarz")
-            .setNegativeButtonText("Anuluj")
+            .setSubtitle("Użyj twarzy / odcisku lub kodu telefonu")
+            .setAllowedAuthenticators(
+                BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            )
             .build()
 
 
@@ -200,7 +203,7 @@ class LockActivity : AppCompatActivity() {
 
     private fun canAuth(): Boolean {
         val result = BiometricManager.from(this).canAuthenticate(
-            BiometricManager.Authenticators.BIOMETRIC_STRONG or
+            BiometricManager.Authenticators.BIOMETRIC_WEAK or
                     BiometricManager.Authenticators.DEVICE_CREDENTIAL
         )
         return result == BiometricManager.BIOMETRIC_SUCCESS

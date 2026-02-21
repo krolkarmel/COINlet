@@ -17,9 +17,9 @@ import com.coinlet.login.Login
 import com.coinlet.register.FirstRegisterStep
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.core.content.ContextCompat
+import com.coinlet.faq.ContactActivity
+import com.coinlet.faq.HelpActivity
 import java.util.concurrent.Executor
 
 
@@ -46,49 +46,6 @@ class SplashScreen : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        //        logowanie biometryczne
-
-        executor = ContextCompat.getMainExecutor(this)
-
-        biometricPrompt = BiometricPrompt(
-            this, executor,
-            object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    Toast.makeText(applicationContext, "Błąd: $errString", Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    if (FirebaseAuth.getInstance().currentUser != null) {
-                        val intent = Intent(this@SplashScreen, Dashboard::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        Toast.makeText(
-                            applicationContext,
-                            "Zaloguj się email/hasło przynajmniej raz, aby włączyć biometrię.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                    Toast.makeText(applicationContext, "Nieudana autoryzacja", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            })
-
-
-        promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Odblokowanie biometryczne")
-            .setSubtitle("Użyj odcisku palca / twarz")
-            .setNegativeButtonText("Anuluj")
-            .build()
 
 
         val user = auth.currentUser
@@ -114,11 +71,21 @@ class SplashScreen : AppCompatActivity() {
 
         binding.btnRegister.setOnClickListener {
             startActivity(Intent(this, FirstRegisterStep::class.java))
+//            startActivity(Intent(this, FaceEnrollActivity::class.java))
         }
 
         binding.btnLogin.setOnClickListener {
             startActivity(Intent(this, Login::class.java))
         }
+
+        binding.btnHelp.setOnClickListener {
+            startActivity(Intent(this, HelpActivity::class.java))
+        }
+
+        binding.btnContact.setOnClickListener {
+            startActivity(Intent(this, ContactActivity::class.java))
+        }
+
     }
 
     private fun routeLoggedUser(userId: String) {
@@ -173,11 +140,4 @@ class SplashScreen : AppCompatActivity() {
             }
     }
 
-    private fun canAuth(): Boolean {
-        val result = BiometricManager.from(this).canAuthenticate(
-            BiometricManager.Authenticators.BIOMETRIC_STRONG or
-                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
-        )
-        return result == BiometricManager.BIOMETRIC_SUCCESS
-    }
 }

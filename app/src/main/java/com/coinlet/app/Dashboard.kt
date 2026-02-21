@@ -12,12 +12,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.coinlet.R
-import com.coinlet.applock.EnterPinActivity
 import com.coinlet.databinding.ActivityDashboardBinding
 import com.coinlet.model.Transactions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlin.jvm.java
 
 class Dashboard : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
@@ -86,7 +86,7 @@ class Dashboard : AppCompatActivity() {
 
             when (item!!.itemId) {
                 R.id.action_settings -> {
-                    Toast.makeText(this, item.title, Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, ActivityUserProfile::class.java))
                 }
                 R.id.action_logout -> {
                 SplashScreen.auth.signOut()

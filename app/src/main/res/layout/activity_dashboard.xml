@@ -120,15 +120,15 @@
             android:src="@drawable/transfericon"
             android:layout_marginHorizontal="16dp"/>
 
-        <ImageButton
-            android:id="@+id/btnChangeCash"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@null"
-            android:scaleType="centerInside"
-            android:src="@drawable/changecashicon"
-            android:contentDescription="Wymiana walut"
-            android:layout_marginHorizontal="16dp"/>
+<!--        <ImageButton-->
+<!--            android:id="@+id/btnChangeCash"-->
+<!--            android:layout_width="80dp"-->
+<!--            android:layout_height="80dp"-->
+<!--            android:background="@null"-->
+<!--            android:scaleType="centerInside"-->
+<!--            android:src="@drawable/changecashicon"-->
+<!--            android:contentDescription="Wymiana walut"-->
+<!--            android:layout_marginHorizontal="16dp"/>-->
 
         <ImageButton android:id="@+id/btnHistory"
             android:layout_width="80dp"
