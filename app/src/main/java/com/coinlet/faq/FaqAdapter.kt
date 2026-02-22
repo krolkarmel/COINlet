@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.coinlet.R
+import com.coinlet.faq.FaqItem
 
 class FaqAdapter(
     private var items: List<FaqItem>

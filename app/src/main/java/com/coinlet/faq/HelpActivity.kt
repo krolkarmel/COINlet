@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.coinlet.R
 import com.coinlet.app.faq.FaqAdapter
-import com.coinlet.app.faq.FaqItem
+import com.coinlet.faq.FaqItem
 import com.coinlet.databinding.ActivityContactBinding
 import com.coinlet.databinding.ActivityHelpBinding
 import kotlin.collections.filter

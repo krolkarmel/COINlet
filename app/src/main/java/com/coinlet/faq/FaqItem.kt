@@ -1,4 +1,4 @@
-package com.coinlet.app.faq
+package com.coinlet.faq
 
 data class FaqItem(
     val question: String,

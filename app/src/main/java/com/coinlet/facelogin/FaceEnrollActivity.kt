@@ -23,6 +23,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
 import com.coinlet.databinding.ActivityFaceEnrollBinding
+import org.bytedeco.javacpp.indexer.IntIndexer
 import org.bytedeco.opencv.global.opencv_core.CV_32SC1
 import org.bytedeco.opencv.global.opencv_core.CV_8UC4
 import org.bytedeco.opencv.global.opencv_imgproc.COLOR_RGBA2GRAY
@@ -41,7 +42,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
-import org.bytedeco.javacpp.indexer.IntIndexer
 
 class FaceEnrollActivity : AppCompatActivity() {
 
@@ -59,6 +59,9 @@ class FaceEnrollActivity : AppCompatActivity() {
 
     private val samples = mutableListOf<Mat>()
     private val modelFileName = "lbph_model.yml"
+
+    // ✅ po zakończeniu enroll blokujemy dalsze statusy
+    private var enrollmentFinished = false
 
     private val requestCameraPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -86,9 +89,10 @@ class FaceEnrollActivity : AppCompatActivity() {
         binding.statusTextView.text = "Status: Oczekiwanie na start…"
 
         binding.btnStartStop.setOnClickListener {
+            if (enrollmentFinished) return@setOnClickListener
+
             ensureCameraPermissionAndStart()
 
-            // toggle collect
             isCollecting = !isCollecting
             binding.btnStartStop.text = if (isCollecting) "Stop" else "Start"
 
@@ -102,7 +106,6 @@ class FaceEnrollActivity : AppCompatActivity() {
     }
 
     private fun resetCollection() {
-        // zwolnij stare próbki (jeśli były)
         for (m in samples) m.release()
         samples.clear()
 
@@ -161,6 +164,9 @@ class FaceEnrollActivity : AppCompatActivity() {
 
     private fun analyzeFrame(imageProxy: ImageProxy) {
         try {
+            // ✅ po udanym enroll nie aktualizuj już statusów (żeby nie było "Brak twarzy")
+            if (enrollmentFinished) return
+
             val bmp = imageProxyToBitmap(imageProxy) ?: return
 
             val rgba = bitmapToRgbaMat(bmp)
@@ -169,14 +175,16 @@ class FaceEnrollActivity : AppCompatActivity() {
             equalizeHist(gray, gray)
 
             val faces = RectVector()
-            faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, Size(80, 80), Size())
+            faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, Size(60, 60), Size())
             val count = faces.size().toInt()
 
             binding.previewView.post {
-                binding.statusTextView.text = when (count) {
-                    0 -> "Status: Brak twarzy"
-                    1 -> if (isCollecting) "Status: Wykryto twarz (zbieranie…)" else "Status: Wykryto twarz"
-                    else -> "Status: Wiele twarzy ($count)"
+                if (!enrollmentFinished) {
+                    binding.statusTextView.text = when (count) {
+                        0 -> "Status: Brak twarzy"
+                        1 -> if (isCollecting) "Status: Wykryto twarz (zbieranie…)" else "Status: Wykryto twarz"
+                        else -> "Status: Wiele twarzy ($count)"
+                    }
                 }
             }
 
@@ -195,7 +203,7 @@ class FaceEnrollActivity : AppCompatActivity() {
                     val face200 = Mat()
                     resize(faceRoi, face200, Size(200, 200))
 
-                    // zapisz próbkę do treningu (clone!)
+                    // próbka do treningu
                     samples.add(face200.clone())
 
                     samplesCollected++
@@ -213,13 +221,17 @@ class FaceEnrollActivity : AppCompatActivity() {
                             binding.statusTextView.text = "Status: Trening modelu…"
                         }
 
-                        // trening w wątku executor (żeby nie blokować UI)
                         cameraExecutor.execute {
                             val ok = trainAndSaveModel()
                             binding.previewView.post {
-                                binding.statusTextView.text =
-                                    if (ok) "Status: Zarejestrowano twarz ✅"
-                                    else "Status: Błąd treningu ❌"
+                                if (ok) {
+                                    enrollmentFinished = true
+                                    binding.statusTextView.text = "Status: Zarejestrowano ✅"
+                                    binding.progressTextView.text = "$targetSamples/$targetSamples"
+                                    binding.btnStartStop.isEnabled = false
+                                } else {
+                                    binding.statusTextView.text = "Status: Błąd treningu ❌"
+                                }
                             }
                         }
                     }
@@ -241,13 +253,11 @@ class FaceEnrollActivity : AppCompatActivity() {
 
             val recognizer = LBPHFaceRecognizer.create()
 
-            // MatVector – bez named args
             val matVector = MatVector(samples.size.toLong())
             for (i in samples.indices) {
                 matVector.put(i.toLong(), samples[i])
             }
 
-            // Labels – wypełnij przez IntIndexer (pewne w Kotlin + bytedeco)
             val labels = Mat(samples.size, 1, CV_32SC1)
             val indexer: IntIndexer = labels.createIndexer()
             for (i in samples.indices) {
@@ -265,13 +275,10 @@ class FaceEnrollActivity : AppCompatActivity() {
             samples.clear()
 
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
-
-
-
 
     private fun initCascade() {
         val input = resources.openRawResource(R.raw.haarcascade_frontalface_default)
@@ -287,7 +294,6 @@ class FaceEnrollActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // sprzątanie próbek jeśli user wyjdzie w trakcie
         for (m in samples) m.release()
         samples.clear()
         cameraExecutor.shutdown()

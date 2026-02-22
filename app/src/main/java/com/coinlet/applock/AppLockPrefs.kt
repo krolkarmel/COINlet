@@ -25,15 +25,47 @@ class AppLockPrefs(context: Context) {
     fun getPinHash(): String? = prefs.getString(KEY_PIN_HASH, null)
     fun getPinSalt(): String? = prefs.getString(KEY_PIN_SALT, null)
 
-    fun isBiometricsEnabled(): Boolean = prefs.getBoolean(KEY_BIOMETRICS_ENABLED, false)
+    fun isFingerprintEnabled(): Boolean = prefs.getBoolean(KEY_FINGERPRINT_ENABLED, false)
+    fun setFingerprintEnabled(value: Boolean) {
+        prefs.edit().putBoolean(KEY_FINGERPRINT_ENABLED, value).apply()
+        syncLegacyBiometricsFlag()
+    }
+
+    fun isFaceEnabled(): Boolean = prefs.getBoolean(KEY_FACE_ENABLED, false)
+    fun setFaceEnabled(value: Boolean) {
+        prefs.edit().putBoolean(KEY_FACE_ENABLED, value).apply()
+        syncLegacyBiometricsFlag()
+    }
+
+    fun isBiometricsEnabled(): Boolean = isFingerprintEnabled() || isFaceEnabled()
+
     fun setBiometricsEnabled(value: Boolean) {
         prefs.edit().putBoolean(KEY_BIOMETRICS_ENABLED, value).apply()
+        if (value) {
+            prefs.edit()
+                .putBoolean(KEY_FINGERPRINT_ENABLED, true)
+                .putBoolean(KEY_FACE_ENABLED, true)
+                .apply()
+        } else {
+            prefs.edit()
+                .putBoolean(KEY_FINGERPRINT_ENABLED, false)
+                .putBoolean(KEY_FACE_ENABLED, false)
+                .apply()
+        }
+    }
+
+    private fun syncLegacyBiometricsFlag() {
+        prefs.edit()
+            .putBoolean(KEY_BIOMETRICS_ENABLED, isFingerprintEnabled() || isFaceEnabled())
+            .apply()
     }
 
     companion object {
         private const val KEY_PIN_HASH = "pin_hash"
         private const val KEY_PIN_SALT = "pin_salt"
-        private const val KEY_BIOMETRICS_ENABLED = "biometrics_enabled"
+
+        private const val KEY_BIOMETRICS_ENABLED = "biometrics_enabled" // legacy
+        private const val KEY_FINGERPRINT_ENABLED = "fingerprint_enabled"
+        private const val KEY_FACE_ENABLED = "face_enabled"
     }
 }
-

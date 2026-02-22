@@ -1,7 +1,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/label_welcome"
+        android:title="Witaj"
+        android:enabled="false" />
+
+    <item
+        android:id="@+id/label_verified"
+        android:title="Konto"
+        android:enabled="false"
+        android:icon="@drawable/noverified"/>
+    <item
         android:id="@+id/action_settings"
         android:title="Dane konta"/>
+    <item
+        android:id="@+id/action_biometrics"
+        android:title="Ustawienia biometrii" />
     <item
         android:id="@+id/action_logout"
         android:title="Wyloguj się"/>

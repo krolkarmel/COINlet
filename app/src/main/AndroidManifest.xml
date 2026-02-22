@@ -21,7 +21,13 @@
         android:theme="@style/Theme.C0inlet"
         tools:targetApi="31">
         <activity
-            android:name=".app.FaqItem"
+            android:name=".applock.BiometricSettings"
+            android:exported="false" />
+        <activity
+            android:name=".facelogin.FaceSetupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".faq.FaqItem"
             android:exported="false" />
         <activity
             android:name=".faq.HelpActivity"
