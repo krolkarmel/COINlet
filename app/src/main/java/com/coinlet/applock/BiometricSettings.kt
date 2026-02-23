@@ -13,7 +13,9 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import com.coinlet.R
+import com.coinlet.facelogin.FaceEnrollActivity
 import com.google.android.material.switchmaterial.SwitchMaterial
+import java.io.File
 import java.util.concurrent.Executor
 
 class BiometricSettings : AppCompatActivity() {
@@ -94,6 +96,7 @@ class BiometricSettings : AppCompatActivity() {
                 ignoreChanges = true
                 swFace.isChecked = false
                 ignoreChanges = false
+                lockPrefs.setFaceEnabled(false)
                 openSecurityOrEnroll()
                 return@setOnCheckedChangeListener
             }
@@ -102,6 +105,12 @@ class BiometricSettings : AppCompatActivity() {
                 onSuccess = {
                     lockPrefs.setFaceEnabled(true)
                     Toast.makeText(this, "Rozpoznawanie twarzy włączone", Toast.LENGTH_SHORT).show()
+
+                    // jeśli brak wzorca -> od razu rejestracja
+                    if (!hasFaceModel()) {
+                        Toast.makeText(this, "Zarejestruj twarz, aby dokończyć konfigurację.", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this, FaceEnrollActivity::class.java))
+                    }
                 },
                 onFail = {
                     ignoreChanges = true
@@ -112,6 +121,21 @@ class BiometricSettings : AppCompatActivity() {
             )
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (lockPrefs.isFaceEnabled() && !hasFaceModel()) {
+            ignoreChanges = true
+            swFace.isChecked = false
+            ignoreChanges = false
+
+            lockPrefs.setFaceEnabled(false)
+            Toast.makeText(this, "Nie zarejestrowano twarzy – logowanie twarzą wyłączone.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun hasFaceModel(): Boolean = File(filesDir, "lbph_model.yml").exists()
 
     private fun canAuthenticate(): Boolean {
         val bm = BiometricManager.from(this)
@@ -134,6 +158,11 @@ class BiometricSettings : AppCompatActivity() {
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
+                    onFail()
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
                     onFail()
                 }
             }

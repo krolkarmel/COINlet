@@ -5,110 +5,106 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:backgroundTint="#C3A922"
+    android:background="#FAF7F7"
     tools:context=".register.FirstRegisterStep">
 
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="176dp"
         android:layout_height="148dp"
-        app:srcCompat="@drawable/logo"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/logo" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Krok 5 z 6"
-        app:layout_constraintTop_toBottomOf="@id/imageView2"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageView2" />
 
     <TextView
         android:id="@+id/textView8"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Twój adres korespondencyjny"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginEnd="28dp"
+        android:ellipsize="end"
+        android:gravity="start"
+        android:maxLines="2"
+        android:text="Twój adres\nkorespondencyjny"
         android:textSize="28sp"
-        app:layout_constraintTop_toBottomOf="@id/textView4"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView4" />
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/streetInput"
         style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Ulica"
-        app:layout_constraintTop_toBottomOf="@id/textView8"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp"
-        android:layout_marginHorizontal="28dp" />
+        android:layout_marginHorizontal="28dp"
+        android:hint="Ulica"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView8" />
 
+    <!-- NR DOMU jako pełna szerokość (żeby po usunięciu kodu nie było “pół pola”) -->
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/houseNumberInput"
         style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Nr domu"
-        app:layout_constraintTop_toBottomOf="@id/streetInput"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/postalCodeInput"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="28dp" />
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/postalCodeInput"
-        style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Kod pocztowy"
-        app:layout_constraintTop_toTopOf="@id/houseNumberInput"
-        app:layout_constraintStart_toEndOf="@id/houseNumberInput"
+        android:layout_marginHorizontal="28dp"
+        android:hint="Nr domu"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="28dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/streetInput" />
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/cityInput"
         style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Miasto"
-        app:layout_constraintTop_toBottomOf="@id/houseNumberInput"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
-        android:layout_marginHorizontal="28dp" />
+        android:layout_marginHorizontal="28dp"
+        android:hint="Miasto"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/houseNumberInput" />
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/countryInput"
         style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Kraj"
-        app:layout_constraintTop_toBottomOf="@id/cityInput"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
-        android:layout_marginHorizontal="28dp" />
+        android:layout_marginHorizontal="28dp"
+        android:hint="Kraj"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cityInput" />
 
     <Button
         android:id="@+id/btnNext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="170dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="32dp"
         android:backgroundTint="#C3A922"
         android:text="Dalej"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="32dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

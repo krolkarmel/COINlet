@@ -60,7 +60,6 @@ class FaceEnrollActivity : AppCompatActivity() {
     private val samples = mutableListOf<Mat>()
     private val modelFileName = "lbph_model.yml"
 
-    // ✅ po zakończeniu enroll blokujemy dalsze statusy
     private var enrollmentFinished = false
 
     private val requestCameraPermission =
@@ -164,7 +163,6 @@ class FaceEnrollActivity : AppCompatActivity() {
 
     private fun analyzeFrame(imageProxy: ImageProxy) {
         try {
-            // ✅ po udanym enroll nie aktualizuj już statusów (żeby nie było "Brak twarzy")
             if (enrollmentFinished) return
 
             val bmp = imageProxyToBitmap(imageProxy) ?: return
@@ -203,7 +201,6 @@ class FaceEnrollActivity : AppCompatActivity() {
                     val face200 = Mat()
                     resize(faceRoi, face200, Size(200, 200))
 
-                    // próbka do treningu
                     samples.add(face200.clone())
 
                     samplesCollected++
@@ -299,7 +296,6 @@ class FaceEnrollActivity : AppCompatActivity() {
         cameraExecutor.shutdown()
     }
 
-    // ======== ImageProxy -> Bitmap helpers ========
 
     private fun imageProxyToBitmap(image: ImageProxy): Bitmap? {
         val yuvImage = imageProxyToYuvImage(image) ?: return null

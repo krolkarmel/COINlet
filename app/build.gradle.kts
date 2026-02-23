@@ -86,4 +86,16 @@ dependencies {
 
     implementation("com.google.guava:guava:32.1.3-android")
     implementation("org.bytedeco:openblas:0.3.28-1.5.12:android-arm64")
+
+    implementation("com.google.mlkit:face-detection:16.1.6")
+    implementation("org.tensorflow:tensorflow-lite:2.14.0")
+
+    debugImplementation("org.bytedeco:javacpp:1.5.12:android-x86_64")
+    debugImplementation("org.bytedeco:opencv:4.11.0-1.5.12:android-x86_64")
+    debugImplementation("org.bytedeco:openblas:0.3.28-1.5.12:android-x86_64")
+
+    debugImplementation("org.bytedeco:javacpp:1.5.12:android-x86_64")
+    debugImplementation("org.bytedeco:opencv:4.11.0-1.5.12:android-x86_64")
+    debugImplementation("org.bytedeco:openblas:0.3.28-1.5.12:android-x86_64")
+
 }

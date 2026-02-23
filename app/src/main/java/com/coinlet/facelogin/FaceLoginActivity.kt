@@ -24,6 +24,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
 import com.coinlet.app.Dashboard
+import com.coinlet.applock.LockActivity
 import com.coinlet.databinding.ActivityFaceLoginBinding
 import org.bytedeco.opencv.global.opencv_core.CV_8UC4
 import org.bytedeco.opencv.global.opencv_imgproc.COLOR_RGBA2GRAY
@@ -58,8 +59,8 @@ class FaceLoginActivity : AppCompatActivity() {
     private var lastAttemptMs = 0L
 
     // startowy próg – potem dopracujesz testami na Xiaomi
-    private val threshold = 80.0
-    private val maxAttempts = 3
+    private val threshold = 49.0
+    private val maxAttempts = 5
 
     private val requestCameraPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -105,8 +106,10 @@ class FaceLoginActivity : AppCompatActivity() {
         }
 
         binding.btnUsePin.setOnClickListener {
-            // jeśli masz konkretną aktywność PIN, tu zrób Intent.
-            // Na razie tylko zamykamy i wracasz do poprzedniego flow.
+            val intent = Intent(this, LockActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(intent)
             finish()
         }
     }
@@ -215,7 +218,7 @@ class FaceLoginActivity : AppCompatActivity() {
             binding.previewView.post {
                 binding.statusTextView.text =
                     if (accept) "Status: Zalogowano ✅"
-                    else "Status: Odrzucono ❌ (próba $attempts/$maxAttempts, dist=${"%.1f".format(distance)})"
+                    else "Status: Odrzucono ❌ (próba $attempts/$maxAttempts)"
             }
 
             faceRoi.release()

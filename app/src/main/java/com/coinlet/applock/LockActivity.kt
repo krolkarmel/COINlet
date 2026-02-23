@@ -9,36 +9,41 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
 import com.coinlet.app.Dashboard
-import com.coinlet.app.SplashScreen
 import com.coinlet.databinding.ActivityLockBinding
-import com.coinlet.databinding.ActivitySplashScreenBinding
-import com.coinlet.register.FirstRegisterStep
+import com.coinlet.facelogin.FaceEnrollActivity
+import com.coinlet.facelogin.FaceLoginActivity
 import com.google.firebase.auth.FirebaseAuth
+import java.io.File
 import java.util.concurrent.Executor
-import androidx.biometric.BiometricManager
-
 
 class LockActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityLockBinding
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
-    private lateinit var promptInfo: androidx.biometric.BiometricPrompt.PromptInfo
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+
     private lateinit var pin1: EditText
     private lateinit var pin2: EditText
     private lateinit var pin3: EditText
     private lateinit var pin4: EditText
+
     private var biometricLaunched = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         binding = ActivityLockBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.lockRoot)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -49,11 +54,7 @@ class LockActivity : AppCompatActivity() {
         pin2 = binding.pin2
         pin3 = binding.pin3
         pin4 = binding.pin4
-
         addTextChangeListener()
-
-
-        //        logowanie biometryczne
 
         executor = ContextCompat.getMainExecutor(this)
 
@@ -62,51 +63,42 @@ class LockActivity : AppCompatActivity() {
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
-                    Toast.makeText(applicationContext, "Błąd: $errString", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(applicationContext, "Błąd: $errString", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    if (FirebaseAuth.getInstance().currentUser != null) {
-                        val intent = Intent(this@LockActivity, Dashboard::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        Toast.makeText(
-                            applicationContext,
-                            "Zaloguj się email/hasło przynajmniej raz, aby włączyć biometrię.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    val intent = Intent(this@LockActivity, Dashboard::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
+                    startActivity(intent)
+                    finish()
                 }
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    Toast.makeText(applicationContext, "Nieudana autoryzacja", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(applicationContext, "Nieudana autoryzacja", Toast.LENGTH_SHORT).show()
                 }
-            })
-
+            }
+        )
 
         promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Odblokowanie biometryczne")
-            .setSubtitle("Użyj twarzy / odcisku lub kodu telefonu")
+            .setSubtitle("Użyj odcisku / blokady telefonu")
             .setAllowedAuthenticators(
                 BiometricManager.Authenticators.BIOMETRIC_WEAK or
                         BiometricManager.Authenticators.DEVICE_CREDENTIAL
             )
             .build()
 
-
+        // Auto-launch palca
         val prefs = AppLockPrefs(this)
-        if (prefs.isBiometricsEnabled() && canAuth() && !biometricLaunched) {
-            biometricLaunched = true
-            biometricPrompt.authenticate(promptInfo)
-        }
+//        if (prefs.isBiometricsEnabled() && canAuth() && !biometricLaunched) {
+//            biometricLaunched = true
+//            biometricPrompt.authenticate(promptInfo)
+//        }
 
+        // ====== PIN ======
         binding.btnUnlock.setOnClickListener {
             val typedPin = getTypedPin()
 
@@ -115,8 +107,6 @@ class LockActivity : AppCompatActivity() {
                 binding.errorTextView.text = "Wpisz 4 cyfry PIN."
                 return@setOnClickListener
             }
-
-            val prefs = AppLockPrefs(this)
 
             val storedHashB64 = prefs.getPinHash()
             val storedSaltB64 = prefs.getPinSalt()
@@ -129,7 +119,6 @@ class LockActivity : AppCompatActivity() {
 
             val salt = PinCrypto.fromB64(storedSaltB64)
             val storedHash = PinCrypto.fromB64(storedHashB64)
-
             val typedHash = PinCrypto.hashPin(typedPin, salt)
 
             val ok = PinCrypto.constantTimeEquals(typedHash, storedHash)
@@ -146,32 +135,49 @@ class LockActivity : AppCompatActivity() {
                 pin1.text?.clear(); pin2.text?.clear(); pin3.text?.clear(); pin4.text?.clear()
                 pin1.requestFocus()
             }
-
         }
 
-
-        binding.btnBiometric.setOnClickListener {
-            val prefs = AppLockPrefs(this)
-            if (prefs.isBiometricsEnabled()) {
+        binding.btnFinger.setOnClickListener {
+            if (prefs.isBiometricsEnabled() && canAuth()) {
                 biometricPrompt.authenticate(promptInfo)
-            }else {
+            } else {
                 binding.errorTextView.visibility = View.VISIBLE
                 binding.errorTextView.text = "Biometria nie jest włączona na tym urządzeniu."
             }
         }
 
+        binding.btnFace.setOnClickListener {
+            if (!isFaceLoginEnabled()) {
+                binding.errorTextView.visibility = View.VISIBLE
+                binding.errorTextView.text = "Logowanie twarzą jest wyłączone w ustawieniach."
+                return@setOnClickListener
+            }
+
+            if (!hasFaceModel()) {
+                Toast.makeText(this, "Brak wzorca – zarejestruj twarz.", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, FaceEnrollActivity::class.java))
+                // nie finish(), bo po enroll wrócisz i możesz od razu kliknąć face ponownie
+                return@setOnClickListener
+            }
+
+            val intent = Intent(this, FaceLoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
+        }
+
         binding.btnBack.setOnClickListener {
             moveTaskToBack(true)
         }
+    }
 
+    private fun isFaceLoginEnabled(): Boolean {
+        return AppLockPrefs(this).isFaceEnabled()
+    }
 
-
-
-
-
-
-
-
+    private fun hasFaceModel(): Boolean {
+        return File(filesDir, "lbph_model.yml").exists()
     }
 
     private fun addTextChangeListener() {
@@ -191,7 +197,6 @@ class LockActivity : AppCompatActivity() {
                 R.id.pin4 -> if (text.isEmpty()) pin3.requestFocus()
             }
         }
-
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     }
@@ -200,7 +205,6 @@ class LockActivity : AppCompatActivity() {
         return pin1.text.toString() + pin2.text.toString() + pin3.text.toString() + pin4.text.toString()
     }
 
-
     private fun canAuth(): Boolean {
         val result = BiometricManager.from(this).canAuthenticate(
             BiometricManager.Authenticators.BIOMETRIC_WEAK or
@@ -208,6 +212,4 @@ class LockActivity : AppCompatActivity() {
         )
         return result == BiometricManager.BIOMETRIC_SUCCESS
     }
-
-
 }

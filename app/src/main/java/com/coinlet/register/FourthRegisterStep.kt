@@ -28,7 +28,7 @@ class FourthRegisterStep : AppCompatActivity() {
             if (validateForm()) {
                 val city = binding.cityInput.text.toString()
                 val street = binding.streetInput.text.toString()
-                val postalCode = binding.postalCodeInput.text.toString()
+//                val postalCode = binding.postalCodeInput.text.toString()
                 val houseNumber = binding.houseNumberInput.text.toString()
                 val country = binding.countryInput.text.toString()
                 val nationality = intent.getStringExtra("nationality") ?: ""
@@ -52,7 +52,7 @@ class FourthRegisterStep : AppCompatActivity() {
                 intent.putExtra("email", email)
                 intent.putExtra("city", city)
                 intent.putExtra("street", street)
-                intent.putExtra("postalCode", postalCode)
+//                intent.putExtra("postalCode", postalCode)
                 intent.putExtra("houseNumber", houseNumber)
                 intent.putExtra("country", country)
                 intent.putExtra("idPhoto1Uri", idPhoto1Uri)
