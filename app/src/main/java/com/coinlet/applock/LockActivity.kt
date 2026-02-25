@@ -17,9 +17,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.coinlet.R
 import com.coinlet.app.Dashboard
 import com.coinlet.databinding.ActivityLockBinding
-import com.coinlet.facelogin.FaceEnrollActivity
-import com.coinlet.facelogin.FaceLoginActivity
-import com.google.firebase.auth.FirebaseAuth
+import com.coinlet.facelogin.FaceEnrollMfnActivity
+import com.coinlet.facelogin.FaceLoginMfnActivity
 import java.io.File
 import java.util.concurrent.Executor
 
@@ -34,8 +33,6 @@ class LockActivity : AppCompatActivity() {
     private lateinit var pin2: EditText
     private lateinit var pin3: EditText
     private lateinit var pin4: EditText
-
-    private var biometricLaunched = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,10 +65,9 @@ class LockActivity : AppCompatActivity() {
 
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    val intent = Intent(this@LockActivity, Dashboard::class.java).apply {
+                    startActivity(Intent(this@LockActivity, Dashboard::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                    startActivity(intent)
+                    })
                     finish()
                 }
 
@@ -91,12 +87,7 @@ class LockActivity : AppCompatActivity() {
             )
             .build()
 
-        // Auto-launch palca
         val prefs = AppLockPrefs(this)
-//        if (prefs.isBiometricsEnabled() && canAuth() && !biometricLaunched) {
-//            biometricLaunched = true
-//            biometricPrompt.authenticate(promptInfo)
-//        }
 
         // ====== PIN ======
         binding.btnUnlock.setOnClickListener {
@@ -124,10 +115,9 @@ class LockActivity : AppCompatActivity() {
             val ok = PinCrypto.constantTimeEquals(typedHash, storedHash)
 
             if (ok) {
-                val intent = Intent(this, Dashboard::class.java).apply {
+                startActivity(Intent(this, Dashboard::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-                startActivity(intent)
+                })
                 finish()
             } else {
                 binding.errorTextView.visibility = View.VISIBLE
@@ -137,6 +127,7 @@ class LockActivity : AppCompatActivity() {
             }
         }
 
+        // ====== BTN FINGER = system biometrics ======
         binding.btnFinger.setOnClickListener {
             if (prefs.isBiometricsEnabled() && canAuth()) {
                 biometricPrompt.authenticate(promptInfo)
@@ -146,6 +137,7 @@ class LockActivity : AppCompatActivity() {
             }
         }
 
+        // ====== BTN FACE = ML Kit + MobileFaceNet ======
         binding.btnFace.setOnClickListener {
             if (!isFaceLoginEnabled()) {
                 binding.errorTextView.visibility = View.VISIBLE
@@ -155,15 +147,13 @@ class LockActivity : AppCompatActivity() {
 
             if (!hasFaceModel()) {
                 Toast.makeText(this, "Brak wzorca – zarejestruj twarz.", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, FaceEnrollActivity::class.java))
-                // nie finish(), bo po enroll wrócisz i możesz od razu kliknąć face ponownie
+                startActivity(Intent(this, FaceEnrollMfnActivity::class.java))
                 return@setOnClickListener
             }
 
-            val intent = Intent(this, FaceLoginActivity::class.java).apply {
+            startActivity(Intent(this, FaceLoginMfnActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            startActivity(intent)
+            })
             finish()
         }
 
@@ -176,9 +166,8 @@ class LockActivity : AppCompatActivity() {
         return AppLockPrefs(this).isFaceEnabled()
     }
 
-    private fun hasFaceModel(): Boolean {
-        return File(filesDir, "lbph_model.yml").exists()
-    }
+    // ML Kit + MobileFaceNet: wzorzec jako embedding
+    private fun hasFaceModel(): Boolean = File(filesDir, "mfn_template.bin").exists()
 
     private fun addTextChangeListener() {
         pin1.addTextChangedListener(EditTextWatcher(pin1))

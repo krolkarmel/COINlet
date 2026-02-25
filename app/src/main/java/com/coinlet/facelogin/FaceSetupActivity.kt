@@ -22,6 +22,8 @@ class FaceSetupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val engine = com.coinlet.facelogin.MobileFaceNetEngine(this)
+        android.util.Log.d("MFN", "Engine init OK, input=${engine.inputSize}, emb=${engine.embeddingDim}")
 
         binding = ActivityFaceSetupBinding.inflate(layoutInflater)
         setContentView(binding.root)
