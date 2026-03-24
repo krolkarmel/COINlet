@@ -15,6 +15,7 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthMissingActivityForRecaptchaException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
@@ -53,25 +54,43 @@ class Login : AppCompatActivity() {
             val email = binding.textInputEmail.text.toString().trim()
             val password = binding.textInputPassword.text.toString()
 
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Podaj email i hasło.", Toast.LENGTH_LONG).show()
+            binding.textInputEmail.error = null
+            binding.textInputPassword.error = null
+
+            if (email.isEmpty()) {
+                binding.textInputEmail.error = "Podaj email"
+                return@setOnClickListener
+            }
+
+            if (password.isEmpty()) {
+                binding.textInputPassword.error = "Podaj hasło"
                 return@setOnClickListener
             }
 
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (!task.isSuccessful) {
-                        Toast.makeText(
-                            this,
-                            "Błąd logowania: ${task.exception?.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        when (task.exception) {
+                            is FirebaseAuthInvalidUserException -> {
+                                binding.textInputEmail.error = "Niepoprawny email"
+                            }
+                            is FirebaseAuthInvalidCredentialsException -> {
+                                binding.textInputPassword.error = "Niepoprawne hasło"
+                            }
+                            else -> {
+                                Toast.makeText(
+                                    this,
+                                    "Nie udało się zalogować. Spróbuj ponownie.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                         return@addOnCompleteListener
                     }
 
                     val userId = FirebaseAuth.getInstance().currentUser?.uid
                     if (userId == null) {
-                        Toast.makeText(this, "Brak sesji po logowaniu.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Błąd logowania", Toast.LENGTH_LONG).show()
                         return@addOnCompleteListener
                     }
 
@@ -83,7 +102,7 @@ class Login : AppCompatActivity() {
                             if (!doc.exists()) {
                                 Toast.makeText(
                                     this,
-                                    "Brak profilu użytkownika w bazie. Zarejestruj konto.",
+                                    "Nie znaleziono danych użytkownika.",
                                     Toast.LENGTH_LONG
                                 ).show()
                                 return@addOnSuccessListener
@@ -95,7 +114,7 @@ class Login : AppCompatActivity() {
                             if (phoneNumberFromDb.isBlank()) {
                                 Toast.makeText(
                                     this,
-                                    "Brak numeru telefonu w profilu – nie można wysłać SMS.",
+                                    "Brak numeru telefonu w profilu.",
                                     Toast.LENGTH_LONG
                                 ).show()
                                 return@addOnSuccessListener
@@ -112,8 +131,8 @@ class Login : AppCompatActivity() {
 
                             PhoneAuthProvider.verifyPhoneNumber(options)
                         }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(this, "Błąd bazy: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                        .addOnFailureListener {
+                            Toast.makeText(this, "Błąd pobierania danych użytkownika.", Toast.LENGTH_LONG).show()
                         }
                 }
         }
@@ -126,12 +145,13 @@ class Login : AppCompatActivity() {
 
         override fun onVerificationFailed(e: FirebaseException) {
             val msg = when (e) {
-                is FirebaseAuthInvalidCredentialsException -> "Nieprawidłowy numer telefonu w profilu."
-                is FirebaseTooManyRequestsException -> "Przekroczono limit SMS. Spróbuj później."
-                is FirebaseAuthMissingActivityForRecaptchaException -> "Błąd reCAPTCHA (brak Activity)."
-                else -> e.message ?: "Nieznany błąd weryfikacji."
+                is FirebaseAuthInvalidCredentialsException -> "Niepoprawny numer telefonu."
+                is FirebaseTooManyRequestsException -> "Zbyt wiele prób. Spróbuj później."
+                is FirebaseAuthMissingActivityForRecaptchaException -> "Błąd weryfikacji. Spróbuj ponownie."
+                else -> "Nie udało się wysłać kodu SMS."
             }
-            Toast.makeText(this@Login, "Weryfikacja SMS nie powiodła się: $msg", Toast.LENGTH_LONG).show()
+
+            Toast.makeText(this@Login, msg, Toast.LENGTH_LONG).show()
         }
 
         override fun onCodeSent(

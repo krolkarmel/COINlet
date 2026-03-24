@@ -42,12 +42,14 @@ class FaceLoginMfnActivity : AppCompatActivity() {
     private val cameraExecutor = Executors.newSingleThreadExecutor()
 
     private lateinit var engine: MobileFaceNetEngine
-    private lateinit var template: FloatArray
+    private var template: FloatArray? = null
 
     private val templateFileName = "mfn_template.bin"
 
     private var cameraStarted = false
+    private var isCameraStarting = false
     private var verifying = false
+    private var loginFinished = false
     private var attempts = 0
     private var lastAttemptMs = 0L
 
@@ -61,7 +63,6 @@ class FaceLoginMfnActivity : AppCompatActivity() {
     private val minFaceSizePx = 160
     private val maxYawDeg = 18f
     private val maxRollDeg = 18f
-
     private val cropScale = 1.35f
 
     private val detector by lazy {
@@ -74,8 +75,13 @@ class FaceLoginMfnActivity : AppCompatActivity() {
 
     private val requestCameraPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) ensureCameraStarted()
-            else Toast.makeText(this, "Brak uprawnień do kamery", Toast.LENGTH_LONG).show()
+            if (granted) {
+                setStatus("Status: Uruchamianie kamery...")
+                ensureCameraStarted()
+            } else {
+                setStatus("Status: Brak uprawnień do kamery")
+                Toast.makeText(this, "Brak uprawnień do kamery", Toast.LENGTH_LONG).show()
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,33 +97,9 @@ class FaceLoginMfnActivity : AppCompatActivity() {
             insets
         }
 
-        binding.btnBack.setOnClickListener { finish() }
-
         engine = MobileFaceNetEngine(this)
 
-        val tplFile = File(filesDir, templateFileName)
-        if (!tplFile.exists()) {
-            binding.statusTextView.text = "Status: Brak wzorca – zarejestruj twarz"
-        } else {
-            template = engine.loadTemplate(tplFile)
-            binding.statusTextView.text = "Status: Oczekiwanie…"
-        }
-
-        binding.btnStartVerify.setOnClickListener {
-            val file = File(filesDir, templateFileName)
-            if (!file.exists()) {
-                setStatus("Status: Brak wzorca – zarejestruj twarz")
-                return@setOnClickListener
-            }
-            template = engine.loadTemplate(file)
-
-            ensureCameraPermissionAndStart()
-
-            verifying = !verifying
-            binding.btnStartVerify.text = if (verifying) "Stop" else "Start"
-            attempts = 0
-            setStatus(if (verifying) "Status: Weryfikacja…" else "Status: Zatrzymano")
-        }
+        binding.btnBack.setOnClickListener { finish() }
 
         binding.btnUsePin.setOnClickListener {
             startActivity(Intent(this, LockActivity::class.java).apply {
@@ -125,66 +107,107 @@ class FaceLoginMfnActivity : AppCompatActivity() {
             })
             finish()
         }
+
+        val tplFile = File(filesDir, templateFileName)
+        if (!tplFile.exists()) {
+            template = null
+            verifying = false
+            setStatus("Status: Brak wzorca – zarejestruj twarz lub użyj PIN")
+        } else {
+            template = engine.loadTemplate(tplFile)
+            attempts = 0
+            verifying = true
+            setStatus("Status: Uruchamianie kamery...")
+            ensureCameraPermissionAndStart()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!loginFinished && verifying && hasCameraPermission()) {
+            ensureCameraStarted()
+        }
     }
 
     private fun setStatus(msg: String) = runOnUiThread {
         binding.statusTextView.text = msg
     }
 
-    private fun ensureCameraPermissionAndStart() {
-        val granted = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+    private fun hasCameraPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED
-        if (granted) ensureCameraStarted() else requestCameraPermission.launch(Manifest.permission.CAMERA)
+    }
+
+    private fun ensureCameraPermissionAndStart() {
+        if (hasCameraPermission()) {
+            ensureCameraStarted()
+        } else {
+            setStatus("Status: Oczekiwanie na zgodę kamery")
+            requestCameraPermission.launch(Manifest.permission.CAMERA)
+        }
     }
 
     private fun ensureCameraStarted() {
-        if (cameraStarted) return
-        cameraStarted = true
+        if (cameraStarted || isCameraStarting || loginFinished) return
+        isCameraStarting = true
         startCamera()
     }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
+            try {
+                val cameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder().build().apply {
-                setSurfaceProvider(binding.previewView.surfaceProvider)
-            }
+                val preview = Preview.Builder().build().apply {
+                    setSurfaceProvider(binding.previewView.surfaceProvider)
+                }
 
-            val analysis = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
+                val analysis = ImageAnalysis.Builder()
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .build()
 
-            analysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                analyzeFrame(imageProxy)
-            }
+                analysis.setAnalyzer(cameraExecutor) { imageProxy ->
+                    analyzeFrame(imageProxy)
+                }
 
-            val selector = try {
-                if (cameraProvider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
-                    isFrontCamera = true
-                    CameraSelector.DEFAULT_FRONT_CAMERA
-                } else {
+                val selector = try {
+                    if (cameraProvider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
+                        isFrontCamera = true
+                        CameraSelector.DEFAULT_FRONT_CAMERA
+                    } else {
+                        isFrontCamera = false
+                        CameraSelector.DEFAULT_BACK_CAMERA
+                    }
+                } catch (_: Exception) {
                     isFrontCamera = false
                     CameraSelector.DEFAULT_BACK_CAMERA
                 }
-            } catch (_: Exception) {
-                isFrontCamera = false
-                CameraSelector.DEFAULT_BACK_CAMERA
-            }
 
-            try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, selector, preview, analysis)
+
+                cameraStarted = true
+                isCameraStarting = false
+                if (verifying) {
+                    setStatus("Status: Weryfikacja...")
+                } else {
+                    setStatus("Status: Kamera działa")
+                }
             } catch (_: Exception) {
+                cameraStarted = false
+                isCameraStarting = false
                 setStatus("Status: Błąd kamery")
+                Toast.makeText(this, "Nie udało się uruchomić kamery", Toast.LENGTH_LONG).show()
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
     private fun analyzeFrame(imageProxy: ImageProxy) {
         try {
-            if (!verifying) return
+            if (!verifying || loginFinished) return
+
+            val loadedTemplate = template ?: return
 
             val now = SystemClock.elapsedRealtime()
             if (now - lastAttemptMs < 350) return
@@ -198,7 +221,7 @@ class FaceLoginMfnActivity : AppCompatActivity() {
             val image = InputImage.fromBitmap(bmp, 0)
             detector.process(image)
                 .addOnSuccessListener { faces ->
-                    if (!verifying) return@addOnSuccessListener
+                    if (!verifying || loginFinished) return@addOnSuccessListener
 
                     if (faces.size != 1) {
                         setStatus(
@@ -231,14 +254,14 @@ class FaceLoginMfnActivity : AppCompatActivity() {
                     }
 
                     val emb = engine.embeddingFromBitmap(crop)
-                    val sim = engine.cosine(template, emb)
-                    val simTxt = "%.3f".format(sim)
+                    val sim = engine.cosine(loadedTemplate, emb)
 
                     when {
                         sim >= acceptTh -> {
                             verifying = false
+                            loginFinished = true
                             runOnUiThread {
-                                binding.statusTextView.text = "Status: Odblokowano ✅ "
+                                binding.statusTextView.text = "Status: Odblokowano ✅"
                                 startActivity(Intent(this, Dashboard::class.java))
                                 finish()
                             }
@@ -246,24 +269,28 @@ class FaceLoginMfnActivity : AppCompatActivity() {
 
                         sim < rejectTh -> {
                             attempts++
-                            setStatus("Status: Odrzucono ❌  ($attempts/$maxAttempts)")
+                            setStatus("Status: Odrzucono ❌ ($attempts/$maxAttempts)")
+
                             if (attempts >= maxAttempts) {
                                 verifying = false
-                                runOnUiThread {
-                                    binding.btnStartVerify.text = "Start"
-                                    binding.statusTextView.text = "Status: Zbyt wiele prób – użyj PIN"
-                                }
+                                setStatus("Status: Zbyt wiele prób – użyj PIN")
+                                Toast.makeText(
+                                    this,
+                                    "Zbyt wiele nieudanych prób. Użyj PIN-u.",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
 
                         else -> {
-                            // ✅ Szara strefa: retry (bez naliczania próby)
-                            setStatus("Status: Niepewne…  — podejdź bliżej / lepsze światło")
+                            setStatus("Status: Niepewne… podejdź bliżej / lepsze światło")
                         }
                     }
                 }
                 .addOnFailureListener {
-                    setStatus("Status: Błąd detekcji")
+                    if (!loginFinished) {
+                        setStatus("Status: Błąd detekcji")
+                    }
                 }
         } finally {
             imageProxy.close()

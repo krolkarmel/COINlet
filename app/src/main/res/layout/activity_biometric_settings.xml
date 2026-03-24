@@ -1,157 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:padding="16dp">
+    tools:context=".applock.BiometricSettings">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/imageViewLogo"
+        android:layout_width="60dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/logo" />
+
+    <TextView
+        android:id="@+id/textViewLogoTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginStart="8dp"
+        android:text="COINlet"
+        android:textColor="#C3A922"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewLogo"
+        app:layout_constraintStart_toEndOf="@id/imageViewLogo"
+        app:layout_constraintTop_toTopOf="@id/imageViewLogo" />
 
-        <!-- Nagłówek -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="60dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="16dp"
+        android:background="@null"
+        android:contentDescription="@string/back_id"
+        android:scaleType="centerInside"
+        android:src="@drawable/back"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewLogo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/imageViewLogo" />
 
-        <TextView
-            android:id="@+id/tvTitle"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/imageViewLogo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ustawienia biometrii"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvSubtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Włącz metody odblokowania aplikacji."
-            android:textSize="14sp"
-            android:textColor="?attr/colorOnSurfaceVariant" />
-
-        <!-- Kafelek: Odcisk palca -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="?attr/colorOutline"
-            app:cardBackgroundColor="?attr/colorSurface">
-
-            <RelativeLayout
+            <TextView
+                android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="14dp">
+                android:text="Ustawienia biometrii"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/ivFingerprint"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="@null"
-                    android:src="@drawable/finger" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/ivFingerprint"
-                    android:layout_marginStart="12dp"
-                    android:layout_toStartOf="@id/swFingerprint"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Odcisk palca"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Potwierdzanie odblokowania odciskiem palca."
-                        android:textSize="13sp"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-                </LinearLayout>
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/swFingerprint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true" />
-
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Kafelek: Twarz -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="?attr/colorOutline"
-            app:cardBackgroundColor="?attr/colorSurface">
-
-            <RelativeLayout
+            <TextView
+                android:id="@+id/tvSubtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="14dp">
+                android:layout_marginTop="6dp"
+                android:text="Włącz metody odblokowania aplikacji."
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="14sp" />
 
-                <ImageView
-                    android:id="@+id/ivFace"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="@null"
-                    android:src="@drawable/face" />
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_toStartOf="@id/swFace"
-                    android:layout_toEndOf="@id/ivFace"
-                    android:orientation="vertical">
+                    android:padding="14dp">
 
-                    <TextView
+                    <ImageView
+                        android:id="@+id/ivFingerprint"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="@null"
+                        android:src="@drawable/finger" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_toEndOf="@id/ivFingerprint"
+                        android:layout_toStartOf="@id/swFingerprint"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Odcisk palca"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Potwierdzanie odblokowania odciskiem palca."
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/swFingerprint"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rozpoznawanie twarzy"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Odblokowanie aplikacji rozpoznawaniem twarzy."
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="13sp" />
-                </LinearLayout>
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/swFace"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true" />
+                    android:padding="14dp">
 
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    <ImageView
+                        android:id="@+id/ivFace"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="@null"
+                        android:src="@drawable/face" />
 
-        <!-- Info box -->
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_toEndOf="@id/ivFace"
+                        android:layout_toStartOf="@id/swFace"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Rozpoznawanie twarzy"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Odblokowanie aplikacji rozpoznawaniem twarzy."
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/swFace"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

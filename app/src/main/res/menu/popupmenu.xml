@@ -16,6 +16,9 @@
         android:id="@+id/action_biometrics"
         android:title="Ustawienia biometrii" />
     <item
+        android:id="@+id/action_change_pin"
+        android:title="Zmień PIN" />
+    <item
         android:id="@+id/action_logout"
         android:title="Wyloguj się"/>
 </menu>

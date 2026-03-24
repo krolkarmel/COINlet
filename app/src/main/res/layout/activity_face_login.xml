@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    tools:context=".facelogin.FaceLoginActivity">
+    tools:context=".facelogin.FaceLoginMfnActivity">
 
     <ImageView
         android:id="@+id/logo1"
@@ -98,14 +98,14 @@
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
-        <Button
-            android:id="@+id/btnStartVerify"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#C3A922"
-            android:text="Start"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+<!--        <Button-->
+<!--            android:id="@+id/btnStartVerify"-->
+<!--            android:layout_width="150dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:backgroundTint="#C3A922"-->
+<!--            android:text="Start"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:textSize="18sp" />-->
 
     </LinearLayout>
 

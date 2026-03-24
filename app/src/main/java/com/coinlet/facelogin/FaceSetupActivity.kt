@@ -3,7 +3,9 @@ package com.coinlet.facelogin
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,13 +19,45 @@ class FaceSetupActivity : AppCompatActivity() {
 
     private val prefs by lazy { getSharedPreferences("security_prefs", MODE_PRIVATE) }
     private val keyEnabled = "face_login_enabled"
-    private val modelFileName = "lbph_model.yml"
+
+    // WAŻNE: ten sam plik co w FaceEnrollMfnActivity i FaceLoginMfnActivity
+    private val modelFileName = "mfn_template.bin"
+
+    private val enrollLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (hasModel()) {
+                setCheckboxSilently(true)
+                prefs.edit().putBoolean(keyEnabled, true).apply()
+                binding.errorTextView.visibility = View.GONE
+            } else {
+                setCheckboxSilently(false)
+                prefs.edit().putBoolean(keyEnabled, false).apply()
+                binding.errorTextView.text =
+                    "Nie zarejestrowano twarzy – logowanie twarzą wyłączone."
+                binding.errorTextView.visibility = View.VISIBLE
+            }
+            refreshUi()
+        }
+
+    private val faceCheckedChangeListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            binding.errorTextView.visibility = View.GONE
+
+            if (isChecked) {
+                if (hasModel()) {
+                    refreshUi()
+                } else {
+                    enrollLauncher.launch(Intent(this, FaceEnrollMfnActivity::class.java))
+                }
+            } else {
+                prefs.edit().putBoolean(keyEnabled, false).apply()
+                refreshUi()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val engine = com.coinlet.facelogin.MobileFaceNetEngine(this)
-        android.util.Log.d("MFN", "Engine init OK, input=${engine.inputSize}, emb=${engine.embeddingDim}")
 
         binding = ActivityFaceSetupBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -38,19 +72,14 @@ class FaceSetupActivity : AppCompatActivity() {
 
         val fromOnboarding = intent.getBooleanExtra("fromOnboarding", false)
         val enabledFromPrefs = prefs.getBoolean(keyEnabled, false)
-        if (fromOnboarding && !prefs.contains(keyEnabled)) {
-            binding.checkboxEnableFaceLogin.isChecked = true
-        } else {
-            binding.checkboxEnableFaceLogin.isChecked = enabledFromPrefs
+
+        val initialChecked = when {
+            fromOnboarding && !prefs.contains(keyEnabled) -> false
+            else -> enabledFromPrefs && hasModel()
         }
 
-        binding.checkboxEnableFaceLogin.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked && !hasModel()) {
-                binding.errorTextView.visibility = View.GONE
-                startActivity(Intent(this, FaceEnrollActivity::class.java))
-            }
-            refreshUi()
-        }
+        setCheckboxSilently(initialChecked)
+        binding.checkboxEnableFaceLogin.setOnCheckedChangeListener(faceCheckedChangeListener)
 
         binding.btnContinue.setOnClickListener {
             val wantsEnabled = binding.checkboxEnableFaceLogin.isChecked
@@ -59,7 +88,7 @@ class FaceSetupActivity : AppCompatActivity() {
                 binding.errorTextView.text =
                     "Najpierw zarejestruj twarz, aby włączyć logowanie twarzą."
                 binding.errorTextView.visibility = View.VISIBLE
-                startActivity(Intent(this, FaceEnrollActivity::class.java))
+                enrollLauncher.launch(Intent(this, FaceEnrollMfnActivity::class.java))
                 return@setOnClickListener
             }
 
@@ -72,8 +101,8 @@ class FaceSetupActivity : AppCompatActivity() {
             goToDashboard()
         }
 
-        if (fromOnboarding && binding.checkboxEnableFaceLogin.isChecked && !hasModel()) {
-            startActivity(Intent(this, FaceEnrollActivity::class.java))
+        if (fromOnboarding && !hasModel()) {
+            binding.errorTextView.visibility = View.GONE
         }
 
         refreshUi()
@@ -81,16 +110,34 @@ class FaceSetupActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        // Fallback: gdyby użytkownik wrócił po rejestracji bez callbacka,
+        // a plik już istnieje, od razu zaznacz checkbox.
+        if (hasModel()) {
+            binding.errorTextView.visibility = View.GONE
+            if (!binding.checkboxEnableFaceLogin.isChecked) {
+                setCheckboxSilently(true)
+            }
+        }
+
         refreshUi()
     }
 
     private fun hasModel(): Boolean = File(filesDir, modelFileName).exists()
 
+    private fun setCheckboxSilently(checked: Boolean) {
+        binding.checkboxEnableFaceLogin.setOnCheckedChangeListener(null)
+        binding.checkboxEnableFaceLogin.isChecked = checked
+        binding.checkboxEnableFaceLogin.setOnCheckedChangeListener(faceCheckedChangeListener)
+    }
+
     private fun refreshUi() {
         val enabled = binding.checkboxEnableFaceLogin.isChecked
         val model = hasModel()
 
-        binding.errorTextView.visibility = View.GONE
+        if (model) {
+            binding.errorTextView.visibility = View.GONE
+        }
 
         binding.infoTextView.text = when {
             !enabled -> "Logowanie twarzą jest wyłączone. Możesz korzystać z PIN."

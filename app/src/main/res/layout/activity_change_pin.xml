@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    tools:context=".app.ChangePinActivity">
+
+    <ImageView
+        android:id="@+id/logo1"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:contentDescription="@string/logo_coinllet"
+        android:src="@drawable/logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@null"
+        android:contentDescription="@string/back_id"
+        android:scaleType="centerInside"
+        android:src="@drawable/back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Zmiana PIN"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/logo1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/subtitleTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:gravity="center"
+        android:text="Aby zmienić kod PIN, podaj aktualny PIN, a następnie wpisz nowy kod i potwierdź zmianę."
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/changePinCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:layout_constraintTop_toBottomOf="@id/subtitleTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/pinSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dane do zmiany PIN"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/etOldPin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Aktualny PIN"
+                android:inputType="numberPassword"
+                android:maxLength="4"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etNewPin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Nowy PIN"
+                android:inputType="numberPassword"
+                android:maxLength="4"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etConfirmNewPin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Potwierdź nowy PIN"
+                android:inputType="numberPassword"
+                android:maxLength="4"
+                android:padding="12dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/infoTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:text="Kod PIN służy do dodatkowego potwierdzania wybranych operacji w aplikacji."
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/changePinCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btnSavePin"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="#C3A922"
+        android:text="Zapisz nowy PIN"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

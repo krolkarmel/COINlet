@@ -42,7 +42,9 @@ class FaceEnrollMfnActivity : AppCompatActivity() {
     private lateinit var engine: MobileFaceNetEngine
 
     private var cameraStarted = false
+    private var isCameraStarting = false
     private var isCollecting = false
+    private var isEnrollmentFinished = false
     private var samplesCollected = 0
     private var lastSampleTimeMs = 0L
 
@@ -68,8 +70,13 @@ class FaceEnrollMfnActivity : AppCompatActivity() {
 
     private val requestCameraPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) ensureCameraStarted()
-            else Toast.makeText(this, "Brak uprawnień do kamery", Toast.LENGTH_LONG).show()
+            if (granted) {
+                binding.statusTextView.text = "Status: Uruchamianie kamery..."
+                ensureCameraStarted()
+            } else {
+                binding.statusTextView.text = "Status: Brak uprawnień do kamery"
+                Toast.makeText(this, "Brak uprawnień do kamery", Toast.LENGTH_LONG).show()
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,21 +97,21 @@ class FaceEnrollMfnActivity : AppCompatActivity() {
         binding.btnBack.setOnClickListener { finish() }
 
         binding.progressTextView.text = "0/$targetSamples"
-        binding.statusTextView.text = "Status: Oczekiwanie na start…"
+        binding.statusTextView.text = "Status: Uruchamianie kamery..."
 
-        binding.btnStartStop.setOnClickListener {
-            ensureCameraPermissionAndStart()
+        ensureCameraPermissionAndStart()
+    }
 
-            isCollecting = !isCollecting
-            binding.btnStartStop.text = if (isCollecting) "Stop" else "Start"
-
-            if (isCollecting) {
-                resetCollection()
-                binding.statusTextView.text = "Status: Zbieranie próbek… (patrz prosto, podejdź bliżej)"
-            } else {
-                binding.statusTextView.text = "Status: Zatrzymano"
-            }
+    override fun onResume() {
+        super.onResume()
+        if (hasCameraPermission() && !isEnrollmentFinished) {
+            ensureCameraStarted()
         }
+    }
+
+    private fun hasCameraPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED
     }
 
     private fun resetCollection() {
@@ -114,61 +121,81 @@ class FaceEnrollMfnActivity : AppCompatActivity() {
         binding.progressTextView.text = "0/$targetSamples"
     }
 
+    private fun startAutoCollection() {
+        if (isEnrollmentFinished) return
+
+        resetCollection()
+        isCollecting = true
+        binding.statusTextView.text =
+            "Status: Zbieranie próbek... (patrz prosto, podejdź bliżej)"
+    }
+
     private fun ensureCameraPermissionAndStart() {
-        val granted = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED
-        if (granted) ensureCameraStarted() else requestCameraPermission.launch(Manifest.permission.CAMERA)
+        if (hasCameraPermission()) {
+            ensureCameraStarted()
+        } else {
+            binding.statusTextView.text = "Status: Oczekiwanie na zgodę kamery"
+            requestCameraPermission.launch(Manifest.permission.CAMERA)
+        }
     }
 
     private fun ensureCameraStarted() {
-        if (cameraStarted) return
-        cameraStarted = true
+        if (cameraStarted || isCameraStarting) return
+        isCameraStarting = true
         startCamera()
     }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
+            try {
+                val cameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder().build().apply {
-                setSurfaceProvider(binding.previewView.surfaceProvider)
-            }
+                val preview = Preview.Builder().build().apply {
+                    setSurfaceProvider(binding.previewView.surfaceProvider)
+                }
 
-            val analysis = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
+                val analysis = ImageAnalysis.Builder()
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .build()
 
-            analysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                analyzeFrame(imageProxy)
-            }
+                analysis.setAnalyzer(cameraExecutor) { imageProxy ->
+                    analyzeFrame(imageProxy)
+                }
 
-            val selector = try {
-                if (cameraProvider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
-                    isFrontCamera = true
-                    CameraSelector.DEFAULT_FRONT_CAMERA
-                } else {
+                val selector = try {
+                    if (cameraProvider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
+                        isFrontCamera = true
+                        CameraSelector.DEFAULT_FRONT_CAMERA
+                    } else {
+                        isFrontCamera = false
+                        CameraSelector.DEFAULT_BACK_CAMERA
+                    }
+                } catch (_: Exception) {
                     isFrontCamera = false
                     CameraSelector.DEFAULT_BACK_CAMERA
                 }
-            } catch (_: Exception) {
-                isFrontCamera = false
-                CameraSelector.DEFAULT_BACK_CAMERA
-            }
 
-            try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, selector, preview, analysis)
+
+                cameraStarted = true
+                isCameraStarting = false
                 binding.statusTextView.text = "Status: Kamera działa"
+
+                startAutoCollection()
             } catch (_: Exception) {
+                cameraStarted = false
+                isCameraStarting = false
                 binding.statusTextView.text = "Status: Błąd kamery"
+                Toast.makeText(this, "Nie udało się uruchomić kamery", Toast.LENGTH_LONG).show()
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
     private fun analyzeFrame(imageProxy: ImageProxy) {
         try {
-            if (!isCollecting) return
+            if (!isCollecting || isEnrollmentFinished) return
 
             val now = SystemClock.elapsedRealtime()
             if (now - lastSampleTimeMs < 450) return
@@ -182,7 +209,7 @@ class FaceEnrollMfnActivity : AppCompatActivity() {
             val image = InputImage.fromBitmap(bmp, 0)
             detector.process(image)
                 .addOnSuccessListener { faces ->
-                    if (!isCollecting) return@addOnSuccessListener
+                    if (!isCollecting || isEnrollmentFinished) return@addOnSuccessListener
 
                     if (faces.size != 1) {
                         binding.statusTextView.text =
@@ -213,7 +240,7 @@ class FaceEnrollMfnActivity : AppCompatActivity() {
                         return@addOnSuccessListener
                     }
 
-                    val emb = engine.embeddingFromBitmap(crop) // już L2-normalized
+                    val emb = engine.embeddingFromBitmap(crop)
                     embeddings.add(emb)
 
                     samplesCollected++
@@ -222,17 +249,21 @@ class FaceEnrollMfnActivity : AppCompatActivity() {
 
                     if (samplesCollected >= targetSamples) {
                         isCollecting = false
-                        binding.btnStartStop.text = "Start"
-                        binding.statusTextView.text = "Status: Budowanie wzorca…"
+                        isEnrollmentFinished = true
+                        binding.statusTextView.text = "Status: Budowanie wzorca..."
 
                         val template = buildRobustTemplate(embeddings)
                         engine.saveTemplate(File(filesDir, templateFileName), template)
 
+                        setResult(RESULT_OK)
                         binding.statusTextView.text = "Status: Zarejestrowano ✅"
+                        Toast.makeText(this, "Twarz została zarejestrowana", Toast.LENGTH_LONG).show()
                     }
                 }
                 .addOnFailureListener {
-                    binding.statusTextView.text = "Status: Błąd detekcji"
+                    if (!isEnrollmentFinished) {
+                        binding.statusTextView.text = "Status: Błąd detekcji"
+                    }
                 }
         } finally {
             imageProxy.close()
@@ -244,11 +275,10 @@ class FaceEnrollMfnActivity : AppCompatActivity() {
 
         val mean1 = l2Normalize(average(samples))
 
-        // score = cosine(mean1, sample) (sample jest już normalized)
         val scored = samples.map { s -> s to cosine(mean1, s) }
             .sortedByDescending { it.second }
 
-        val keep = max(8, (samples.size * 0.75f).toInt()) // trzymaj top 75% (min 8)
+        val keep = max(8, (samples.size * 0.75f).toInt())
         val kept = scored.take(keep).map { it.first }
 
         val mean2 = average(kept)
@@ -258,7 +288,11 @@ class FaceEnrollMfnActivity : AppCompatActivity() {
     private fun average(list: List<FloatArray>): FloatArray {
         val n = list[0].size
         val out = FloatArray(n)
-        for (e in list) for (i in 0 until n) out[i] += e[i]
+        for (e in list) {
+            for (i in 0 until n) {
+                out[i] += e[i]
+            }
+        }
         for (i in 0 until n) out[i] /= list.size.toFloat()
         return out
     }

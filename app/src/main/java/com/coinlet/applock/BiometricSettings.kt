@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -13,13 +14,14 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import com.coinlet.R
-import com.coinlet.facelogin.FaceEnrollActivity
+import com.coinlet.facelogin.FaceEnrollMfnActivity
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.io.File
 import java.util.concurrent.Executor
 
 class BiometricSettings : AppCompatActivity() {
 
+    private lateinit var btnBack: ImageButton
     private lateinit var swFingerprint: SwitchMaterial
     private lateinit var swFace: SwitchMaterial
 
@@ -35,12 +37,17 @@ class BiometricSettings : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_biometric_settings)
 
+        btnBack = findViewById(R.id.btnBack)
         swFingerprint = findViewById(R.id.swFingerprint)
         swFace = findViewById(R.id.swFace)
 
+        btnBack.setOnClickListener {
+            finish()
+        }
+
         ignoreChanges = true
         swFingerprint.isChecked = lockPrefs.isFingerprintEnabled()
-        swFace.isChecked = lockPrefs.isFaceEnabled()
+        swFace.isChecked = lockPrefs.isFaceEnabled() && hasFaceModel()
         ignoreChanges = false
 
         swFingerprint.setOnCheckedChangeListener { _, isChecked ->
@@ -103,13 +110,27 @@ class BiometricSettings : AppCompatActivity() {
 
             showBiometricPrompt(
                 onSuccess = {
-                    lockPrefs.setFaceEnabled(true)
-                    Toast.makeText(this, "Rozpoznawanie twarzy włączone", Toast.LENGTH_SHORT).show()
-
-                    // jeśli brak wzorca -> od razu rejestracja
                     if (!hasFaceModel()) {
-                        Toast.makeText(this, "Zarejestruj twarz, aby dokończyć konfigurację.", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this, FaceEnrollActivity::class.java))
+                        lockPrefs.setFaceEnabled(false)
+
+                        ignoreChanges = true
+                        swFace.isChecked = false
+                        ignoreChanges = false
+
+                        Toast.makeText(
+                            this,
+                            "Zarejestruj twarz, aby dokończyć konfigurację.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        startActivity(Intent(this, FaceEnrollMfnActivity::class.java))
+                    } else {
+                        lockPrefs.setFaceEnabled(true)
+                        Toast.makeText(
+                            this,
+                            "Rozpoznawanie twarzy włączone",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 },
                 onFail = {
@@ -131,11 +152,21 @@ class BiometricSettings : AppCompatActivity() {
             ignoreChanges = false
 
             lockPrefs.setFaceEnabled(false)
-            Toast.makeText(this, "Nie zarejestrowano twarzy – logowanie twarzą wyłączone.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "Nie zarejestrowano twarzy – logowanie twarzą wyłączone.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        if (hasFaceModel() && !swFace.isChecked && lockPrefs.isFaceEnabled()) {
+            ignoreChanges = true
+            swFace.isChecked = true
+            ignoreChanges = false
         }
     }
 
-    private fun hasFaceModel(): Boolean = File(filesDir, "lbph_model.yml").exists()
+    private fun hasFaceModel(): Boolean = File(filesDir, "mfn_template.bin").exists()
 
     private fun canAuthenticate(): Boolean {
         val bm = BiometricManager.from(this)

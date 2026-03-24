@@ -71,6 +71,13 @@ class FourthRegisterStep : AppCompatActivity() {
         else{
             binding.countryInput.error = null
         }
+        if(!Validator.isCityValid(binding.cityInput.text.toString())){
+            binding.cityInput.error = "Niepoprawnie wprowadzona nazwa miasta!"
+            isValid = false
+        }
+        else{
+            binding.countryInput.error = null
+        }
         if(!Validator.isNumberHouseValid(binding.houseNumberInput.text.toString())){
             binding.houseNumberInput.error = "Niepoprawnie wprowadzony numer domu!"
             isValid = false

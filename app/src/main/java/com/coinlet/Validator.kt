@@ -35,17 +35,24 @@ object Validator {
         val regex = Regex("^[0-9]{11}$")
         return regex.matches(pesel)
     }
-    fun isCountryValid(country : String):Boolean{
-        val regex = Regex("^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśżź]+(?: [A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśżź]+)*\$")
-        return regex.matches(country)
+    fun isCityValid(city: String): Boolean {
+        val regex = Regex("^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśżź]+(?:[- ][A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśżź]+)*$")
+        return regex.matches(city.trim())
     }
-    fun isNumberHouseValid(houseNumber : String): Boolean{
-        val regex = Regex("^[0-9]{1,4}[A-Za-z]?(\\/[0-9]{1,3})?\$")
-        return regex.matches(houseNumber)
+
+    fun isCountryValid(country: String): Boolean {
+        val regex = Regex("^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśżź]+(?: [A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśżź]+)*$")
+        return regex.matches(country.trim())
     }
-    fun isStreetValid(street : String): Boolean{
-        val regex = Regex("^[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśżź0-9 .-]{2,50}$")
-        return regex.matches(street)
+
+    fun isStreetValid(street: String): Boolean {
+        val regex = Regex("^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśżź]+(?: [A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśżź]+)*$")
+        return regex.matches(street.trim())
+    }
+
+    fun isNumberHouseValid(houseNumber: String): Boolean {
+        val number = houseNumber.trim().toIntOrNull() ?: return false
+        return number in 1..9999
     }
     fun isPasswordValid(password : String): Boolean{
         val regex = Regex("^(?=.*[A-Z])(?=.*[0-9]).{8,}\$")

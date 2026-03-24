@@ -21,11 +21,14 @@
         android:theme="@style/Theme.C0inlet"
         tools:targetApi="31">
         <activity
+            android:name=".app.ChangePinActivity"
+            android:exported="false" />
+        <activity
             android:name=".facelogin.FaceEnrollMfnActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".facelogin.FaceLoginMfnActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".applock.BiometricSettings"
             android:exported="false" />
